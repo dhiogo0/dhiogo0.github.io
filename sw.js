@@ -1,10 +1,23 @@
-const CACHE = 'racha-facil-v6';
+const CACHE = 'racha-facil-v7';
 
 const STATIC_ASSETS = [
   '/assets/icons/icon.svg',
   '/assets/icons/og-image.svg',
   '/manifest.json',
 ];
+
+/* ── Notificacao de fim de timer ── */
+self.addEventListener('message', event => {
+  if (event.data?.type !== 'TIMER_END') return;
+  self.registration.showNotification('Fim de Jogo! ⏰', {
+    body: 'O cronometro do Racha Facil acabou!',
+    icon: '/assets/icons/icon.svg',
+    badge: '/assets/icons/icon.svg',
+    vibrate: [200, 100, 200, 100, 200],
+    tag: 'timer-end',
+    renotify: true,
+  });
+});
 
 /* ── Install: pre-cache only static assets ── */
 self.addEventListener('install', event => {

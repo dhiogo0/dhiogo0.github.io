@@ -4,6 +4,7 @@ let _timeLeft   = _duration;
 let _running    = false;
 let _intervalId = null;
 let _finished   = false;
+let _startedAt  = null; // timestamp real para corrigir throttle de background
 
 const PRESETS = [
   { label: '5m',  val: 5  * 60 },
@@ -39,6 +40,49 @@ function _playAlarm() {
   } catch (_) {}
 }
 
+function _notifyEnd() {
+  // Envia para o Service Worker mostrar notificacao na tela bloqueada
+  if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.controller.postMessage({ type: 'TIMER_END' });
+  } else if (Notification.permission === 'granted') {
+    new Notification('Fim de Jogo! ⏰', {
+      body: 'O cronometro do Racha Facil acabou!',
+      icon: '/assets/icons/icon.svg',
+    });
+  }
+}
+
+async function _requestNotificationPermission() {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'default') {
+    await Notification.requestPermission();
+  }
+}
+
+function _finish() {
+  _timeLeft   = 0;
+  _running    = false;
+  _finished   = true;
+  _startedAt  = null;
+  clearInterval(_intervalId);
+  _intervalId = null;
+  _playAlarm();
+  _notifyEnd();
+  window.App?.render();
+}
+
+/* ── Recalcula tempo ao voltar do background (corrige throttle do SO) ── */
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden || !_running || !_startedAt) return;
+  const elapsed = Math.floor((Date.now() - _startedAt) / 1000);
+  _timeLeft = Math.max(0, _duration - elapsed);
+  if (_timeLeft === 0) {
+    _finish();
+  } else {
+    window.App?.render();
+  }
+});
+
 /* ── Public getters ── */
 
 export function isTimerRunning() { return _running; }
@@ -47,25 +91,26 @@ export function isTimerRunning() { return _running; }
 
 export function timerStart() {
   if (_running || _finished) return;
+  _requestNotificationPermission();
+  // Calcula o startedAt considerando tempo ja decorrido (retomada apos pause)
+  _startedAt  = Date.now() - (_duration - _timeLeft) * 1000;
   _running    = true;
   _intervalId = setInterval(() => {
-    _timeLeft--;
-    if (_timeLeft <= 0) {
-      _timeLeft   = 0;
-      _running    = false;
-      _finished   = true;
-      clearInterval(_intervalId);
-      _intervalId = null;
-      _playAlarm();
+    const elapsed = Math.floor((Date.now() - _startedAt) / 1000);
+    _timeLeft = Math.max(0, _duration - elapsed);
+    if (_timeLeft === 0) {
+      _finish();
+    } else {
+      window.App?.render();
     }
-    window.App?.render();
   }, 1000);
   window.App?.render();
 }
 
 export function timerPause() {
   if (!_running) return;
-  _running = false;
+  _running    = false;
+  _startedAt  = null;
   clearInterval(_intervalId);
   _intervalId = null;
   window.App?.render();
@@ -76,6 +121,7 @@ export function timerReset() {
   _intervalId = null;
   _running    = false;
   _finished   = false;
+  _startedAt  = null;
   _timeLeft   = _duration;
   window.App?.render();
 }
@@ -85,6 +131,7 @@ export function timerSetDuration(secs) {
   _intervalId = null;
   _running    = false;
   _finished   = false;
+  _startedAt  = null;
   _duration   = secs;
   _timeLeft   = secs;
   window.App?.render();
