@@ -43,18 +43,20 @@ function _renderActions(swapMode, history) {
     <div class="actions-row">
       <button
         class="btn btn--ghost btn--sm ${swapMode ? 'btn--swap-active' : ''}"
+        data-tooltip="${swapMode ? 'Desativar modo troca' : 'Trocar jogadores entre times'}"
         onclick="App.toggleSwapMode()">
         ${swapMode ? '✅ Troca ON' : '🔄 Trocar'}
       </button>
       ${history.length
-        ? `<button class="btn btn--ghost btn--sm" onclick="App.undo()">↩️ Desfazer</button>`
+        ? `<button class="btn btn--ghost btn--sm" data-tooltip="Desfazer última troca" onclick="App.undo()">↩️ Desfazer</button>`
         : ''}
       <button
         class="btn btn--ghost btn--sm btn--whatsapp"
+        data-tooltip="Compartilhar no WhatsApp"
         onclick="App.exportWhatsapp()">
         📤 Zap
       </button>
-      <button class="btn btn--ghost btn--sm" onclick="App.draw()" title="Novo sorteio">🔁</button>
+      <button class="btn btn--ghost btn--sm" data-tooltip="Fazer novo sorteio" onclick="App.draw()">🔁</button>
     </div>
   `;
 }
@@ -82,7 +84,7 @@ function _renderTeamCard(team, idx, swapMode, swapSelected) {
     : `<span
         class="team-card__name team-card__name--editable"
         onclick="App.startRenameTeam(${team.id})"
-        title="Toque para renomear">
+        data-tooltip="Clique para renomear">
         ${escHtml(team.name.toUpperCase())}
       </span>`;
 

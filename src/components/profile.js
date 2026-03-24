@@ -2,7 +2,7 @@ import { store } from '../state/store.js';
 import { escHtml } from '../utils/helpers.js';
 
 export function renderProfile() {
-  const { profile, players, drawHistory, playersPerTeam } = store;
+  const { profile, players, drawHistory, playersPerTeam, currentUser } = store;
 
   const totalDraws   = drawHistory.length;
   const totalPlayers = players.length;
@@ -16,8 +16,28 @@ export function renderProfile() {
     </button>
   `).join('');
 
+  const authSection = currentUser
+    ? `<div class="auth-card auth-card--signed">
+        <img class="auth-avatar" src="${escHtml(currentUser.photoURL || '')}" alt="${escHtml(currentUser.displayName || '')}"/>
+        <div class="auth-card__user">
+          <p class="auth-card__name">${escHtml(currentUser.displayName || 'Usuário')}</p>
+          <p class="auth-card__email">${escHtml(currentUser.email || '')}</p>
+        </div>
+        <button class="btn btn--ghost btn--sm" onclick="App.signOut()">Sair</button>
+      </div>`
+    : `<div class="auth-card">
+        <p class="auth-card__title">Sincronize seus dados</p>
+        <p class="auth-card__sub">Jogadores e histórico disponíveis em qualquer dispositivo</p>
+        <button class="btn-google" onclick="App.signIn()">
+          <span class="btn-google__icon">G</span>
+          Entrar com Google
+        </button>
+      </div>`;
+
   return `
     <div class="fade-up">
+
+      ${authSection}
 
       <div class="card" style="margin-bottom:16px">
         <p class="card__headline">👤 MEU PERFIL</p>

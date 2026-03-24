@@ -19,20 +19,38 @@ import {
   cancelRenameTeam,
   loadDraw,
   updateProfile,
+  togglePresence,
+  toggleAllPresence,
 } from './state/store.js';
 
-import { renderStarsWidget }  from './utils/helpers.js';
-import { renderHeader }       from './components/header.js';
-import { renderBottomNav }    from './components/bottomnav.js';
-import { renderPlayers }      from './components/players.js';
-import { renderConfig }       from './components/config.js';
-import { renderDrawing }      from './components/drawing.js';
-import { renderTeams }        from './components/teams.js';
-import { renderHistory }      from './components/history.js';
-import { renderProfile }      from './components/profile.js';
+import { savePlayers, saveHistory, saveProfile } from './utils/storage.js';
+import { renderStarsWidget } from './utils/helpers.js';
+import { showToast }         from './utils/toast.js';
+import { renderHeader }      from './components/header.js';
+import { renderBottomNav }   from './components/bottomnav.js';
+import { renderPlayers }     from './components/players.js';
+import { renderConfig }      from './components/config.js';
+import { renderDrawing }     from './components/drawing.js';
+import { renderTeams }       from './components/teams.js';
+import { renderHistory }     from './components/history.js';
+import { renderProfile }     from './components/profile.js';
+
+import { signInWithGoogle, signOutUser, onAuthChange } from './firebase/auth.js';
+import { loadUserData, saveUserData }                  from './firebase/db.js';
 
 /* ── Root element ── */
 const root = document.getElementById('app');
+
+/* ── Cloud sync ── */
+function _syncToCloud() {
+  const user = store.currentUser;
+  if (!user) return;
+  saveUserData(user.uid, {
+    players: store.players.map(({ present, ...p }) => p),
+    history: store.drawHistory,
+    profile: store.profile,
+  }).catch(err => console.error('Sync error:', err));
+}
 
 /* ── Main render ── */
 function render() {
@@ -114,7 +132,7 @@ window.App = {
 
   addOrUpdatePlayer() {
     const ok = addOrUpdatePlayer();
-    if (ok) render();
+    if (ok) { render(); _syncToCloud(); }
   },
 
   editPlayer(id) {
@@ -132,15 +150,30 @@ window.App = {
   removePlayer(id) {
     removePlayer(id);
     render();
+    _syncToCloud();
+  },
+
+  togglePresence(id) {
+    togglePresence(id);
+    render();
+  },
+
+  toggleAllPresence() {
+    toggleAllPresence();
+    render();
   },
 
   setPlayersPerTeam(n) {
     setPlayersPerTeam(n);
     render();
+    _syncToCloud();
   },
 
   draw() {
-    draw(render);
+    draw(() => {
+      render();
+      _syncToCloud();
+    });
     render();
   },
 
@@ -188,8 +221,60 @@ window.App = {
 
   updateProfile(key, value) {
     updateProfile(key, value);
+    _syncToCloud();
+  },
+
+  async signIn() {
+    try {
+      await signInWithGoogle();
+    } catch (err) {
+      if (err.code !== 'auth/popup-closed-by-user') {
+        showToast('Erro ao entrar. Tente novamente.', 'error');
+      }
+    }
+  },
+
+  async signOut() {
+    await signOutUser();
+    store.currentUser = null;
+    showToast('Você saiu da conta.');
+    render();
   },
 };
+
+/* ── Auth state listener ── */
+onAuthChange(async (user) => {
+  store.currentUser = user;
+
+  if (user) {
+    try {
+      const cloudData = await loadUserData(user.uid);
+      if (cloudData) {
+        if (cloudData.players?.length)  store.players     = cloudData.players;
+        if (cloudData.history?.length)  store.drawHistory = cloudData.history;
+        if (cloudData.profile) {
+          store.profile       = { ...store.profile, ...cloudData.profile };
+          store.playersPerTeam = store.profile.defaultPlayersPerTeam || 5;
+        }
+        savePlayers(store.players);
+        saveHistory(store.drawHistory);
+        saveProfile(store.profile);
+      } else {
+        await saveUserData(user.uid, {
+          players: store.players,
+          history: store.drawHistory,
+          profile: store.profile,
+        });
+      }
+    } catch (err) {
+      console.error('Cloud load error:', err);
+    }
+    const firstName = user.displayName?.split(' ')[0] || 'jogador';
+    showToast(`Bem-vindo, ${firstName}!`);
+  }
+
+  render();
+});
 
 /* ── Boot ── */
 render();

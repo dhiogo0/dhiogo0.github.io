@@ -12,6 +12,7 @@ export function renderConfig() {
     .map(n => `
       <button
         class="preset-btn ${playersPerTeam === n ? 'preset-btn--active' : ''}"
+        data-tooltip="${n} por time"
         onclick="App.setPlayersPerTeam(${n})">
         ${n}v${n}
       </button>
@@ -25,12 +26,14 @@ export function renderConfig() {
         <label class="field__label">Jogadores por time</label>
         <div class="counter-row">
           <button class="counter-btn"
+            data-tooltip="Menos jogadores"
             onclick="App.setPlayersPerTeam(Math.max(2,${playersPerTeam}-1))">−</button>
           <div class="counter-center">
             <span class="counter-num">${playersPerTeam}</span>
             <span class="counter-label">por time</span>
           </div>
           <button class="counter-btn"
+            data-tooltip="Mais jogadores"
             onclick="App.setPlayersPerTeam(Math.min(${players.length},${playersPerTeam}+1))">+</button>
         </div>
 
@@ -61,6 +64,7 @@ export function renderConfig() {
       <div style="margin-top:16px">
         <button
           class="btn btn--primary btn--draw"
+          data-tooltip="Embaralhar e criar os times"
           onclick="App.draw()"
           ${nt < 2 ? 'disabled' : ''}>
           ⚽ SORTEAR TIMES!

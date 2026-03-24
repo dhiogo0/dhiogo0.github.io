@@ -20,6 +20,7 @@ export const store = {
   starHover:       0,
   renamingTeamId:  null,
   drawHistory:     loadHistory(),
+  currentUser:     null,
   profile: {
     nickname:              _savedProfile.nickname              || '',
     defaultPlayersPerTeam: _savedProfile.defaultPlayersPerTeam || 5,
@@ -27,12 +28,27 @@ export const store = {
 };
 
 /* ── Computed ── */
+export function presentPlayers() {
+  return store.players.filter(p => p.present !== false);
+}
+
 export function numTeams() {
-  return Math.floor(store.players.length / store.playersPerTeam);
+  return Math.floor(presentPlayers().length / store.playersPerTeam);
 }
 
 export function reserveCount() {
-  return store.players.length - numTeams() * store.playersPerTeam;
+  return presentPlayers().length - numTeams() * store.playersPerTeam;
+}
+
+export function togglePresence(id) {
+  store.players = store.players.map(p =>
+    p.id === id ? { ...p, present: p.present === false } : p
+  );
+}
+
+export function toggleAllPresence() {
+  const allPresent = store.players.every(p => p.present !== false);
+  store.players = store.players.map(p => ({ ...p, present: !allPresent }));
 }
 
 /* ── Actions ── */
@@ -104,7 +120,7 @@ export function updateProfile(key, value) {
 export function draw(onDone) {
   store.step = 2;
   setTimeout(() => {
-    const shuffled = [...store.players].sort(() => Math.random() - 0.5);
+    const shuffled = [...presentPlayers()].sort(() => Math.random() - 0.5);
     const result   = snakeDraft(shuffled, store.playersPerTeam);
     store.teams        = result.teams;
     store.reserves     = result.reserves;

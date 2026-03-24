@@ -6,7 +6,9 @@ const KEYS = {
 
 export function loadPlayers() {
   try {
-    return JSON.parse(localStorage.getItem(KEYS.PLAYERS) || '[]');
+    const raw = JSON.parse(localStorage.getItem(KEYS.PLAYERS) || '[]');
+    // Presence is ephemeral — always starts as present
+    return raw.map(p => ({ ...p, present: true }));
   } catch {
     return [];
   }
@@ -14,7 +16,9 @@ export function loadPlayers() {
 
 export function savePlayers(players) {
   try {
-    localStorage.setItem(KEYS.PLAYERS, JSON.stringify(players));
+    // Strip ephemeral presence field before persisting
+    const toSave = players.map(({ present, ...p }) => p);
+    localStorage.setItem(KEYS.PLAYERS, JSON.stringify(toSave));
   } catch {
     console.warn('localStorage unavailable');
   }
