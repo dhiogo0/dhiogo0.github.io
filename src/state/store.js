@@ -39,6 +39,7 @@ export const store = {
   championshipFormat:    'round-robin',
   scoringMatchId:        null,
   confirmEndChampionship: false,
+  championshipUndo:      null,
   profile: {
     nickname:              _savedProfile.nickname              || '',
     defaultPlayersPerTeam: _savedProfile.defaultPlayersPerTeam || 5,
@@ -297,7 +298,25 @@ export function cancelScoringMatch() {
 
 export function registerSequentialResultAction(result) {
   if (!store.championship) return;
-  registerSequentialResult(store.championship, result);
+  const c = store.championship;
+  store.championshipUndo = {
+    currentHomeId: c.currentHomeId,
+    currentAwayId: c.currentAwayId,
+    queue:         [...c.queue],
+    matches:       JSON.parse(JSON.stringify(c.matches)),
+  };
+  registerSequentialResult(c, result);
+  saveChampionship(c);
+}
+
+export function undoSequentialResult() {
+  if (!store.championship || !store.championshipUndo) return;
+  const snap = store.championshipUndo;
+  store.championship.currentHomeId = snap.currentHomeId;
+  store.championship.currentAwayId = snap.currentAwayId;
+  store.championship.queue         = snap.queue;
+  store.championship.matches       = snap.matches;
+  store.championshipUndo           = null;
   saveChampionship(store.championship);
 }
 

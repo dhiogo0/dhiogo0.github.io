@@ -1,33 +1,15 @@
-const CACHE = 'racha-facil-v5';
+const CACHE = 'racha-facil-v6';
 
-const APP_SHELL = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/assets/css/style.css',
+const STATIC_ASSETS = [
   '/assets/icons/icon.svg',
   '/assets/icons/og-image.svg',
-  '/src/app.js',
-  '/src/data/constants.js',
-  '/src/utils/storage.js',
-  '/src/utils/toast.js',
-  '/src/utils/helpers.js',
-  '/src/logic/balance.js',
-  '/src/state/store.js',
-  '/src/components/header.js',
-  '/src/components/players.js',
-  '/src/components/config.js',
-  '/src/components/drawing.js',
-  '/src/components/teams.js',
-  '/src/components/history.js',
-  '/src/components/profile.js',
-  '/src/components/bottomnav.js',
+  '/manifest.json',
 ];
 
-/* ── Install: pre-cache app shell ── */
+/* ── Install: pre-cache only static assets ── */
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE).then(cache => cache.addAll(APP_SHELL))
+    caches.open(CACHE).then(cache => cache.addAll(STATIC_ASSETS))
   );
   self.skipWaiting();
 });
@@ -48,7 +30,7 @@ self.addEventListener('fetch', event => {
 
   const url = new URL(event.request.url);
 
-  // Google Fonts: stale-while-revalidate
+  // Google Fonts: cache-first (raramente mudam)
   if (
     url.hostname === 'fonts.googleapis.com' ||
     url.hostname === 'fonts.gstatic.com'
@@ -56,28 +38,35 @@ self.addEventListener('fetch', event => {
     event.respondWith(
       caches.open(CACHE).then(cache =>
         cache.match(event.request).then(cached => {
-          const fetched = fetch(event.request).then(res => {
+          if (cached) return cached;
+          return fetch(event.request).then(res => {
             cache.put(event.request, res.clone());
             return res;
-          }).catch(() => cached);
-          return cached || fetched;
+          });
         })
       )
     );
     return;
   }
 
-  // Same-origin: cache-first, network fallback
+  // Icones e manifest: cache-first
+  if (url.origin === self.location.origin && STATIC_ASSETS.includes(url.pathname)) {
+    event.respondWith(
+      caches.match(event.request).then(cached => cached || fetch(event.request))
+    );
+    return;
+  }
+
+  // JS, CSS, HTML: network-first — sempre busca versao atualizada, cai no cache se offline
   if (url.origin === self.location.origin) {
     event.respondWith(
-      caches.match(event.request).then(cached => {
-        if (cached) return cached;
-        return fetch(event.request).then(res => {
-          const clone = res.clone();
-          caches.open(CACHE).then(cache => cache.put(event.request, clone));
-          return res;
-        }).catch(() => caches.match('/index.html'));
-      })
+      fetch(event.request).then(res => {
+        const clone = res.clone();
+        caches.open(CACHE).then(cache => cache.put(event.request, clone));
+        return res;
+      }).catch(() =>
+        caches.match(event.request).then(cached => cached || caches.match('/index.html'))
+      )
     );
   }
 });

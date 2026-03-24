@@ -1,6 +1,7 @@
 import { store }                                        from '../state/store.js';
 import { getStandings, getSequentialStandings }         from '../logic/championship.js';
 import { escHtml }                                      from '../utils/helpers.js';
+import { renderTimer, isTimerRunning }                  from './timer.js';
 
 export function renderChampionship() {
   const { championship } = store;
@@ -56,12 +57,13 @@ function _renderOngoing(c) {
 
   return `
     <div class="fade-up">
+      ${renderTimer()}
       <div class="champ-header">
         <p class="champ-header__name">${escHtml(c.name)}</p>
         <span class="badge">${_formatLabel(c.format)}</span>
       </div>
       ${c.format === 'groups+knockout' ? _renderStandings(c) : ''}
-      ${_renderMatchList(c, false)}
+      ${_renderMatchList(c, false, isTimerRunning())}
     </div>
   `;
 }
@@ -72,7 +74,8 @@ function _renderSequential(c) {
   const home  = c.teams.find(t => t.id === c.currentHomeId);
   const away  = c.teams.find(t => t.id === c.currentAwayId);
   const queue = c.queue.map(id => c.teams.find(t => t.id === id)).filter(Boolean);
-  const { confirmEndChampionship } = store;
+  const { confirmEndChampionship, championshipUndo } = store;
+  const timerRunning = isTimerRunning();
 
   const queuePreview = queue.length
     ? queue.map(t => `<span class="seq-queue-team"><span class="standings-dot standings-dot--sm" style="background:${t.color}"></span>${escHtml(t.name)}</span>`).join('<span class="seq-queue-arrow">→</span>')
@@ -80,6 +83,7 @@ function _renderSequential(c) {
 
   return `
     <div class="fade-up">
+      ${renderTimer()}
       <div class="champ-header">
         <p class="champ-header__name">${escHtml(c.name)}</p>
         <span class="badge">${_formatLabel(c.format)}</span>
@@ -98,6 +102,9 @@ function _renderSequential(c) {
             <span class="current-match-dot" style="background:${away?.color}"></span>
           </div>
         </div>
+        ${timerRunning ? `
+          <div class="timer-blocking-msg">Aguarde o fim do cronometro para registrar o resultado</div>
+        ` : `
         <div class="result-btns">
           <button class="result-btn result-btn--win" onclick="App.registerResult('home')"
             style="--team-color:${home?.color || 'var(--green)'}">
@@ -114,6 +121,12 @@ function _renderSequential(c) {
             <span class="result-btn__name">${escHtml(away?.name || '?')}</span>
           </button>
         </div>
+        ${championshipUndo ? `
+          <button class="btn btn--ghost btn--sm seq-undo-btn" onclick="App.undoResult()">
+            ↩ Desfazer ultimo resultado
+          </button>
+        ` : ''}
+        `}
       </div>
 
       ${queue.length ? `
@@ -242,7 +255,7 @@ function _renderStandings(c) {
 
 /* ── Match list ── */
 
-function _renderMatchList(c, readonly) {
+function _renderMatchList(c, readonly, timerRunning = false) {
   const { scoringMatchId } = store;
   const groups = {};
 
@@ -256,11 +269,11 @@ function _renderMatchList(c, readonly) {
     .sort((a, b) => _groupSortKey(a[0]) - _groupSortKey(b[0]))
     .map(([label, matches]) => `
       <div class="section-title" style="margin-bottom:8px"><span>${label}</span></div>
-      ${matches.map(m => _renderMatchCard(c, m, readonly, scoringMatchId)).join('')}
+      ${matches.map(m => _renderMatchCard(c, m, readonly, scoringMatchId, timerRunning)).join('')}
     `).join('');
 }
 
-function _renderMatchCard(c, m, readonly, scoringId) {
+function _renderMatchCard(c, m, readonly, scoringId, timerRunning = false) {
   const home  = c.teams.find(t => t.id === m.homeTeamId);
   const away  = c.teams.find(t => t.id === m.awayTeamId);
   const homeN = home ? escHtml(home.name) : 'A definir';
@@ -285,7 +298,7 @@ function _renderMatchCard(c, m, readonly, scoringId) {
         <span class="match-team ${homeWon ? 'match-team--winner' : ''}">${homeDot}${homeN}</span>
         <span class="match-scoreline">${m.homeScore} × ${m.awayScore}</span>
         <span class="match-team match-team--right ${awayWon ? 'match-team--winner' : ''}">${awayN}${awayDot}</span>
-        ${!readonly && m.phase === 'group'
+        ${!readonly && !timerRunning && m.phase === 'group'
           ? `<button class="btn btn--ghost btn--sm match-edit-btn" onclick="App.startScore(${m.id})">✏️</button>`
           : ''}
       </div>
@@ -316,7 +329,9 @@ function _renderMatchCard(c, m, readonly, scoringId) {
       <span class="match-team">${homeDot}${homeN}</span>
       <span class="match-vs">×</span>
       <span class="match-team">${awayDot}${awayN}</span>
-      <button class="btn btn--primary btn--sm match-score-btn" onclick="App.startScore(${m.id})">
+      <button class="btn btn--primary btn--sm match-score-btn"
+        onclick="App.startScore(${m.id})"
+        ${timerRunning ? 'disabled' : ''}>
         Placar
       </button>
     </div>

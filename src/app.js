@@ -33,6 +33,7 @@ import {
   requestEndChampionship,
   cancelEndChampionship as cancelEndChampionshipAction,
   confirmEndChampionship as confirmEndChampionshipAction,
+  undoSequentialResult,
 } from './state/store.js';
 
 import { savePlayers, saveHistory, saveProfile } from './utils/storage.js';
@@ -45,6 +46,7 @@ import { renderConfig }      from './components/config.js';
 import { renderDrawing }     from './components/drawing.js';
 import { renderTeams }       from './components/teams.js';
 import { renderChampionship } from './components/championship.js';
+import { timerStart, timerPause, timerReset, timerSetDuration } from './components/timer.js';
 import { renderProfile }     from './components/profile.js';
 
 import { signInWithGoogle, signOutUser, onAuthChange } from './firebase/auth.js';
@@ -300,6 +302,11 @@ window.App = {
     render();
   },
 
+  undoResult() {
+    undoSequentialResult();
+    render();
+  },
+
   endChampionship() {
     requestEndChampionship();
     render();
@@ -314,6 +321,11 @@ window.App = {
     confirmEndChampionshipAction();
     render();
   },
+
+  timerStart()      { timerStart(); },
+  timerPause()      { timerPause(); },
+  timerReset()      { timerReset(); },
+  timerSetDuration(secs) { timerSetDuration(secs); },
 
   async signIn() {
     try {

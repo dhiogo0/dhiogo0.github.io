@@ -940,6 +940,89 @@ html, body {
   font-size: 13px; color: var(--text); margin-bottom: 12px; text-align: center;
 }
 
+/* ── Timer ── */
+@keyframes timerPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+  50%       { box-shadow: 0 0 0 7px rgba(239,68,68,0.18); }
+}
+
+.timer-card {
+  background: var(--glass2);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.timer-card--finished {
+  border-color: rgba(239,68,68,0.45);
+  background: rgba(239,68,68,0.06);
+  animation: timerPulse 1.2s ease-in-out infinite;
+}
+.timer-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.timer-card__title {
+  font-family: var(--font-display);
+  font-size: 13px; font-weight: 700; letter-spacing: 1.2px;
+  color: var(--muted);
+}
+.timer-presets { display: flex; gap: 5px; }
+.timer-preset {
+  padding: 4px 9px; border-radius: 7px;
+  border: 1px solid var(--border); background: var(--glass);
+  color: var(--dimmed); font-size: 11px; font-weight: 600;
+  cursor: pointer; font-family: var(--font-body); transition: all 0.14s;
+}
+.timer-preset--active {
+  border-color: var(--green);
+  background: rgba(0,232,122,0.1);
+  color: var(--green);
+}
+.timer-preset:disabled { opacity: 0.35; cursor: default; }
+.timer-display {
+  font-family: var(--font-display);
+  font-size: 58px; font-weight: 800;
+  text-align: center; letter-spacing: 3px; line-height: 1;
+  margin: 4px 0 10px;
+  transition: color 0.3s;
+}
+.timer-progress {
+  height: 4px; background: rgba(255,255,255,0.08);
+  border-radius: 2px; overflow: hidden; margin-bottom: 12px;
+}
+.timer-progress__fill {
+  height: 100%; border-radius: 2px;
+  transition: width 1s linear, background 0.3s;
+}
+.timer-controls { display: flex; gap: 8px; }
+.timer-btn-main { flex: 1; }
+.timer-finished-msg {
+  flex: 1; padding: 10px 13px;
+  background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.4);
+  color: #ef4444; border-radius: 10px;
+  font-size: 14px; font-weight: 700; text-align: center;
+  font-family: var(--font-display); letter-spacing: 1px;
+  animation: timerPulse 1.2s ease-in-out infinite;
+}
+.timer-blocking-msg {
+  text-align: center; padding: 12px;
+  font-size: 12px; color: var(--dimmed);
+  border: 1px dashed var(--border2); border-radius: var(--radius-sm);
+  margin-top: 4px;
+}
+.seq-undo-btn {
+  width: 100%; margin-top: 8px;
+  font-size: 12px; color: var(--dimmed);
+}
+.match-score-btn:disabled {
+  background: rgba(255,255,255,0.07) !important;
+  color: var(--dimmed) !important;
+  cursor: default; pointer-events: none;
+}
+
 /* ── Responsive ── */
 @media (max-width:360px) {
   .counter-num     { font-size:52px; }
