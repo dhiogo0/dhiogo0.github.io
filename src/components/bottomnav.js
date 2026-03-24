@@ -24,9 +24,9 @@ export function renderBottomNav() {
       disabled: drawDisabled,
     },
     {
-      id:       'history',
-      icon:     '📋',
-      label:    'Histórico',
+      id:       'championship',
+      icon:     '🏆',
+      label:    'Campeonato',
       disabled: false,
     },
     {
@@ -57,7 +57,7 @@ function _activeSection() {
   if (step === 0)              return 'add';
   if (step === 6)              return 'players';
   if (step >= 1 && step <= 3) return 'draw';
-  if (step === 4)              return 'history';
+  if (step === 4)              return 'championship';
   if (step === 5)              return 'profile';
   return 'add';
 }

@@ -21,6 +21,18 @@ import {
   updateProfile,
   togglePresence,
   toggleAllPresence,
+  openChampionshipModal,
+  closeChampionshipModal,
+  setChampionshipFormat,
+  createChampionshipFromDraw,
+  registerMatchScore,
+  setScoringMatch,
+  cancelScoringMatch,
+  archiveAndClearChampionship,
+  registerSequentialResultAction,
+  requestEndChampionship,
+  cancelEndChampionship as cancelEndChampionshipAction,
+  confirmEndChampionship as confirmEndChampionshipAction,
 } from './state/store.js';
 
 import { savePlayers, saveHistory, saveProfile } from './utils/storage.js';
@@ -32,7 +44,7 @@ import { renderAddPlayer, renderPlayersList } from './components/players.js';
 import { renderConfig }      from './components/config.js';
 import { renderDrawing }     from './components/drawing.js';
 import { renderTeams }       from './components/teams.js';
-import { renderHistory }     from './components/history.js';
+import { renderChampionship } from './components/championship.js';
 import { renderProfile }     from './components/profile.js';
 
 import { signInWithGoogle, signOutUser, onAuthChange } from './firebase/auth.js';
@@ -61,7 +73,7 @@ function render() {
   else if (step === 1) content = renderConfig();
   else if (step === 2) content = renderDrawing();
   else if (step === 3) content = renderTeams();
-  else if (step === 4) content = renderHistory();
+  else if (step === 4) content = renderChampionship();
   else if (step === 5) content = renderProfile();
   else if (step === 6) content = renderPlayersList();
 
@@ -104,7 +116,7 @@ window.App = {
         if (store.players.length < 2 && !store.teams.length) return;
         setStep(store.teams.length ? 3 : 1);
         break;
-      case 'history':
+      case 'championship':
         setStep(4);
         break;
       case 'profile':
@@ -239,6 +251,68 @@ window.App = {
   updateProfile(key, value) {
     updateProfile(key, value);
     _syncToCloud();
+  },
+
+  openChampionshipModal() {
+    openChampionshipModal();
+    render();
+  },
+
+  closeChampionshipModal() {
+    closeChampionshipModal();
+    render();
+  },
+
+  selectChampionshipFormat(format) {
+    setChampionshipFormat(format);
+    render();
+  },
+
+  confirmChampionship() {
+    createChampionshipFromDraw();
+    render();
+  },
+
+  startScore(matchId) {
+    setScoringMatch(matchId);
+    render();
+  },
+
+  cancelScore() {
+    cancelScoringMatch();
+    render();
+  },
+
+  confirmScore(matchId) {
+    const home = parseInt(document.getElementById(`sh-${matchId}`)?.value ?? 0, 10);
+    const away = parseInt(document.getElementById(`sa-${matchId}`)?.value ?? 0, 10);
+    registerMatchScore(matchId, isNaN(home) ? 0 : home, isNaN(away) ? 0 : away);
+    render();
+  },
+
+  newChampionship() {
+    archiveAndClearChampionship();
+    render();
+  },
+
+  registerResult(result) {
+    registerSequentialResultAction(result);
+    render();
+  },
+
+  endChampionship() {
+    requestEndChampionship();
+    render();
+  },
+
+  cancelEndChampionship() {
+    cancelEndChampionshipAction();
+    render();
+  },
+
+  confirmEndChampionship() {
+    confirmEndChampionshipAction();
+    render();
   },
 
   async signIn() {

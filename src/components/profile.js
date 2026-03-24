@@ -2,7 +2,7 @@ import { store } from '../state/store.js';
 import { escHtml } from '../utils/helpers.js';
 
 export function renderProfile() {
-  const { profile, players, drawHistory, playersPerTeam, currentUser } = store;
+  const { profile, players, drawHistory, championshipHistory, playersPerTeam, currentUser } = store;
 
   const totalDraws   = drawHistory.length;
   const totalPlayers = players.length;
@@ -92,7 +92,82 @@ export function renderProfile() {
         </div>
       </div>
 
+      ${_renderChampionshipHistory(championshipHistory)}
+      ${_renderDrawHistory(drawHistory)}
+
     </div>
+  `;
+}
+
+function _renderChampionshipHistory(history) {
+  if (!history.length) return '';
+
+  const formatLabel = { 'round-robin': 'Pontos Corridos', 'knockout': 'Mata-mata', 'groups+knockout': 'Pontos + Final' };
+
+  const items = history.slice(0, 5).map((c, i) => {
+    const champion = c.teams?.find(t => t.id === c.championId);
+    const date     = new Date(c.createdAt).toLocaleDateString('pt-BR');
+    return `
+      <div class="hist-entry" style="animation-delay:${i * 0.05}s">
+        <div class="hist-entry__meta">
+          <span class="hist-entry__date">📅 ${date}</span>
+          <span class="hist-entry__info">${formatLabel[c.format] || c.format} · ${c.teams?.length || 0} times</span>
+        </div>
+        ${champion ? `
+          <div class="hist-pills">
+            <div class="hist-pill" style="border-color:${champion.color}33;background:${champion.color}0d">
+              <span class="hist-pill__dot" style="background:${champion.color}"></span>
+              <span class="hist-pill__name">🏆 ${escHtml(champion.name)}</span>
+            </div>
+          </div>` : ''}
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <div class="section-title" style="margin-top:22px;margin-bottom:12px">
+      <span>Campeonatos</span>
+      <span class="badge">${history.length}</span>
+    </div>
+    ${items}
+  `;
+}
+
+function _renderDrawHistory(drawHistory) {
+  if (!drawHistory.length) return '';
+
+  const { teamAvg } = window.__rachaHelpers || {};
+
+  const items = drawHistory.slice(0, 5).map((entry, i) => {
+    const date  = new Date(entry.date).toLocaleDateString('pt-BR') +
+                  ' às ' + new Date(entry.date).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    const nRes  = entry.reserves.length;
+    const pills = entry.teams.map(t => `
+      <div class="hist-pill" style="border-color:${t.color}33;background:${t.color}0d">
+        <span class="hist-pill__dot" style="background:${t.color}"></span>
+        <span class="hist-pill__name">${escHtml(t.name)}</span>
+      </div>
+    `).join('');
+    return `
+      <div class="hist-entry" style="animation-delay:${i * 0.05}s">
+        <div class="hist-entry__meta">
+          <span class="hist-entry__date">📅 ${date}</span>
+          <span class="hist-entry__info">${entry.teams.length} times · ${entry.playersPerTeam}×${entry.teams.length}${nRes ? ` · ${nRes} reserva${nRes > 1 ? 's' : ''}` : ''}</span>
+        </div>
+        <div class="hist-pills">${pills}</div>
+        <button class="btn btn--ghost btn--sm hist-entry__btn" onclick="App.loadDraw(${entry.id})">
+          Ver este sorteio →
+        </button>
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <div class="section-title" style="margin-top:22px;margin-bottom:12px">
+      <span>Sorteios Anteriores</span>
+      <span class="badge">${drawHistory.length}</span>
+    </div>
+    ${items}
   `;
 }
 

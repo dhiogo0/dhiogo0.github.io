@@ -1,4 +1,14 @@
-import { loadPlayers, savePlayers, loadHistory, saveHistory, loadProfile, saveProfile } from '../utils/storage.js';
+import {
+  loadPlayers, savePlayers, loadHistory, saveHistory, loadProfile, saveProfile,
+  loadChampionship, saveChampionship, clearChampionship,
+  loadChampionshipHistory, saveChampionshipHistory,
+} from '../utils/storage.js';
+import {
+  createChampionship as _createChampionship,
+  registerScore,
+  registerSequentialResult,
+  finishSequentialChampionship,
+} from '../logic/championship.js';
 import { snakeDraft }  from '../logic/balance.js';
 import { showToast }   from '../utils/toast.js';
 
@@ -18,11 +28,17 @@ export const store = {
   reserves:        [],
   swapMode:        false,
   swapSelected:    null,
-  history:         [],
-  starHover:       0,
-  renamingTeamId:  null,
-  drawHistory:     loadHistory(),
-  currentUser:     null,
+  history:             [],
+  starHover:           0,
+  renamingTeamId:      null,
+  drawHistory:         loadHistory(),
+  currentUser:         null,
+  championship:          loadChampionship(),
+  championshipHistory:   loadChampionshipHistory(),
+  championshipModal:     false,
+  championshipFormat:    'round-robin',
+  scoringMatchId:        null,
+  confirmEndChampionship: false,
   profile: {
     nickname:              _savedProfile.nickname              || '',
     defaultPlayersPerTeam: _savedProfile.defaultPlayersPerTeam || 5,
@@ -235,6 +251,84 @@ export function exportWhatsapp() {
     store.reserves.forEach(p => { txt += `${_emojiForPos(p.position)} ${p.name}\n`; });
   }
   window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(txt), '_blank');
+}
+
+/* ── Championship actions ── */
+
+export function openChampionshipModal() {
+  store.championshipModal  = true;
+  store.championshipFormat = 'round-robin';
+}
+
+export function closeChampionshipModal() {
+  store.championshipModal = false;
+}
+
+export function setChampionshipFormat(format) {
+  store.championshipFormat = format;
+}
+
+export function createChampionshipFromDraw() {
+  const c = _createChampionship(store.teams, store.championshipFormat);
+  store.championship      = c;
+  store.championshipModal = false;
+  saveChampionship(c);
+  setStep(4);
+}
+
+export function registerMatchScore(matchId, homeScore, awayScore) {
+  if (!store.championship) return;
+  registerScore(store.championship, matchId, homeScore, awayScore);
+  store.scoringMatchId = null;
+  saveChampionship(store.championship);
+
+  if (store.championship.status === 'finished') {
+    _archiveChampionship();
+  }
+}
+
+export function setScoringMatch(matchId) {
+  store.scoringMatchId = matchId;
+}
+
+export function cancelScoringMatch() {
+  store.scoringMatchId = null;
+}
+
+export function registerSequentialResultAction(result) {
+  if (!store.championship) return;
+  registerSequentialResult(store.championship, result);
+  saveChampionship(store.championship);
+}
+
+export function requestEndChampionship() {
+  store.confirmEndChampionship = true;
+}
+
+export function cancelEndChampionship() {
+  store.confirmEndChampionship = false;
+}
+
+export function confirmEndChampionship() {
+  if (!store.championship) return;
+  finishSequentialChampionship(store.championship);
+  store.confirmEndChampionship = false;
+  saveChampionship(store.championship);
+  _archiveChampionship();
+}
+
+export function archiveAndClearChampionship() {
+  store.championship           = null;
+  store.scoringMatchId         = null;
+  store.confirmEndChampionship = false;
+  clearChampionship();
+}
+
+function _archiveChampionship() {
+  const c = store.championship;
+  if (!c) return;
+  store.championshipHistory = [c, ...store.championshipHistory].slice(0, 20);
+  saveChampionshipHistory(store.championshipHistory);
 }
 
 /* ── Internals ── */

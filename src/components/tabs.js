@@ -1,10 +1,9 @@
 import { store } from '../state/store.js';
 
 export function renderTabs() {
-  const { step, players, teams, drawHistory } = store;
+  const { step, players, teams } = store;
   const noPlayers = players.length < 2;
   const noTeams   = !teams.length;
-  const noHistory = !drawHistory.length;
 
   return `
     <nav class="tabs" role="tablist" aria-label="Navegação principal">
@@ -30,14 +29,6 @@ export function renderTabs() {
         ${noTeams ? 'disabled' : ''}
         onclick="App.setStep(3)">
         Times
-      </button>
-      <button
-        class="tab ${step === 4 ? 'tab--active' : ''}"
-        role="tab"
-        aria-selected="${step === 4}"
-        ${noHistory ? 'disabled' : ''}
-        onclick="App.setStep(4)">
-        Histórico
       </button>
     </nav>
   `;

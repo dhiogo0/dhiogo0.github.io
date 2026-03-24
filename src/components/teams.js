@@ -3,7 +3,7 @@ import { teamAvg, balanceScore, balanceInfo } from '../logic/balance.js';
 import { posIcon, posLabel, starsDisplay, escHtml } from '../utils/helpers.js';
 
 export function renderTeams() {
-  const { teams, reserves, swapMode, swapSelected, history } = store;
+  const { teams, reserves, swapMode, swapSelected, history, championshipModal, championshipFormat, championship } = store;
   const score = balanceScore(teams);
   const bi    = balanceInfo(score);
 
@@ -15,8 +15,10 @@ export function renderTeams() {
       ${swapMode ? _renderSwapHint(swapSelected) : ''}
       ${teams.map((t, i) => _renderTeamCard(t, i, swapMode, swapSelected)).join('')}
       ${reserves.length ? _renderReserves(reserves, swapMode, swapSelected) : ''}
+      ${_renderChampionshipCTA(teams, championship)}
 
     </div>
+    ${championshipModal ? _renderChampionshipModal(teams, championshipFormat) : ''}
   `;
 }
 
@@ -115,6 +117,66 @@ function _renderTeamCard(team, idx, swapMode, swapSelected) {
         </span>
       </div>
       <div class="team-card__body">${playerRows}</div>
+    </div>
+  `;
+}
+
+function _renderChampionshipCTA(teams, championship) {
+  if (!teams.length) return '';
+
+  if (championship?.status === 'ongoing') {
+    return `
+      <div class="champ-cta">
+        <div class="champ-cta__divider">ou</div>
+        <button class="btn btn--ghost" onclick="App.goTo('championship')">
+          🏆 Ver Campeonato em Andamento
+        </button>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="champ-cta">
+      <div class="champ-cta__divider">ou</div>
+      <button class="btn btn--ghost" onclick="App.openChampionshipModal()">
+        🏆 Fazer Campeonato com Esses Times
+      </button>
+    </div>
+  `;
+}
+
+function _renderChampionshipModal(teams, selectedFormat) {
+  const n = teams.length;
+
+  const formats = [
+    { id: 'round-robin',      emoji: '⚽', label: 'Pontos Corridos', sub: 'Todos jogam entre si',      ok: n >= 2 },
+    { id: 'knockout',         emoji: '🏆', label: 'Mata-mata',        sub: 'Eliminacao direta',          ok: n >= 2 },
+    { id: 'groups+knockout',  emoji: '🔀', label: 'Pontos + Final',   sub: 'Todos jogam, top 2 decidem', ok: n >= 3 },
+  ];
+
+  const options = formats.map(f => `
+    <button
+      class="format-btn ${selectedFormat === f.id ? 'format-btn--active' : ''} ${!f.ok ? 'format-btn--disabled' : ''}"
+      onclick="App.selectChampionshipFormat('${f.id}')"
+      ${!f.ok ? 'disabled' : ''}>
+      <span class="format-btn__emoji">${f.emoji}</span>
+      <span class="format-btn__label">${f.label}</span>
+      <span class="format-btn__sub">${!f.ok ? 'Precisa de 3+ times' : f.sub}</span>
+    </button>
+  `).join('');
+
+  return `
+    <div class="modal-backdrop" onclick="App.closeChampionshipModal()">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal__header">
+          <p class="modal__title">Campeonato do Dia</p>
+        </div>
+        <div class="format-grid">${options}</div>
+        <div class="btn-row" style="margin-top:20px">
+          <button class="btn btn--ghost" style="flex:1" onclick="App.closeChampionshipModal()">Cancelar</button>
+          <button class="btn btn--primary" style="flex:2" onclick="App.confirmChampionship()">Criar →</button>
+        </div>
+      </div>
     </div>
   `;
 }
