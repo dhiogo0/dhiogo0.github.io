@@ -1,0 +1,26 @@
+{
+  "name": "Racha Fácil",
+  "short_name": "Racha",
+  "description": "Sorteio inteligente e balanceado de times de futebol",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#07101e",
+  "theme_color": "#07101e",
+  "lang": "pt-BR",
+  "categories": ["sports", "utilities"],
+  "icons": [
+    {
+      "src": "/assets/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

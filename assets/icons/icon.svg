@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <clipPath id="b"><circle cx="256" cy="256" r="180"/></clipPath>
+  </defs>
+  <!-- Dark rounded background -->
+  <rect width="512" height="512" rx="88" fill="#07101e"/>
+  <!-- White ball -->
+  <circle cx="256" cy="256" r="180" fill="white"/>
+  <!-- Black patches (soccer ball pattern) -->
+  <g clip-path="url(#b)" fill="#1e293b">
+    <!-- Top pentagon -->
+    <path d="M256,88 L304,152 L280,224 H232 L208,152Z"/>
+    <!-- Top-right pentagon -->
+    <path d="M384,184 L404,256 L352,296 L308,256 L328,184Z"/>
+    <!-- Bottom-right pentagon -->
+    <path d="M352,312 L352,356 L304,396 L256,352 L304,312Z"/>
+    <!-- Bottom-left pentagon -->
+    <path d="M160,312 L160,356 L208,396 L256,352 L208,312Z"/>
+    <!-- Top-left pentagon -->
+    <path d="M128,184 L108,256 L160,296 L204,256 L184,184Z"/>
+  </g>
+  <!-- Ball outline -->
+  <circle cx="256" cy="256" r="180" fill="none" stroke="#1e293b" stroke-width="8"/>
+</svg>

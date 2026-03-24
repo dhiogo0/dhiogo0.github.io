@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#07101e"/>
+
+  <!-- Field strip at bottom -->
+  <rect x="0" y="430" width="1200" height="200" fill="#0f3d1f"/>
+  <!-- Field center line -->
+  <line x1="0" y1="430" x2="1200" y2="430" stroke="#166534" stroke-width="3"/>
+  <!-- Center circle -->
+  <circle cx="600" cy="530" r="90" fill="none" stroke="#166534" stroke-width="3" opacity="0.6"/>
+  <!-- Center spot -->
+  <circle cx="600" cy="530" r="6" fill="#166534" opacity="0.6"/>
+
+  <!-- Soccer ball (left side) -->
+  <defs>
+    <clipPath id="ball-og"><circle cx="240" cy="250" r="170"/></clipPath>
+  </defs>
+  <circle cx="240" cy="250" r="170" fill="white"/>
+  <g clip-path="url(#ball-og)" fill="#1e293b">
+    <path d="M240,80 L285,143 L263,212 H217 L195,143Z"/>
+    <path d="M363,175 L381,244 L331,282 L290,244 L308,175Z"/>
+    <path d="M331,295 L331,337 L285,374 L240,332 L285,295Z"/>
+    <path d="M149,295 L149,337 L195,374 L240,332 L195,295Z"/>
+    <path d="M117,175 L99,244 L149,282 L190,244 L172,175Z"/>
+  </g>
+  <circle cx="240" cy="250" r="170" fill="none" stroke="#1e293b" stroke-width="8"/>
+
+  <!-- App name -->
+  <text x="520" y="220" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="130" fill="white" letter-spacing="-3">Racha</text>
+  <text x="520" y="360" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="130" fill="#22c55e" letter-spacing="-3">Fácil</text>
+
+  <!-- Tagline -->
+  <text x="520" y="410" font-family="Arial,sans-serif" font-size="38" fill="#94a3b8">Sorteio inteligente de times de futebol</text>
+</svg>
