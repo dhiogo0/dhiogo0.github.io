@@ -1,4 +1,4 @@
-const CACHE = 'racha-facil-v4';
+const CACHE = 'racha-facil-v5';
 
 const APP_SHELL = [
   '/',
