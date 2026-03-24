@@ -40,15 +40,9 @@ export function starsInput(level, starHover) {
 export function renderStarsWidget(level, starHover) {
   const el = document.getElementById('starsInput');
   if (!el) return;
-  el.innerHTML = '';
-  for (let i = 1; i <= 5; i++) {
-    const lit = (starHover || level) >= i;
-    const s = document.createElement('span');
-    s.className = `star-btn ${lit ? 'star-btn--lit' : ''}`;
-    s.textContent = '★';
-    s.onmouseenter = () => App.onStarHover(i);
-    s.onmouseleave = () => App.onStarHover(0);
-    s.onclick      = () => App.onStarClick(i);
-    el.appendChild(s);
+  const stars = el.children;
+  for (let i = 0; i < stars.length; i++) {
+    const lit = (starHover || level) >= (i + 1);
+    stars[i].className = `star-btn ${lit ? 'star-btn--lit' : ''}`;
   }
 }
