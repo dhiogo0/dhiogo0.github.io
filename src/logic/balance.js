@@ -2,17 +2,42 @@ import { TEAM_NAMES, TEAM_COLORS } from '../data/constants.js';
 
 /**
  * Position-aware Snake Draft:
- * 1. Distributes GKs first — at most 1 per team, sorted by level
- * 2. Snake-drafts all remaining outfield players by level
  *
- * This guarantees no team ends up with 2 GKs while another has none
- * (when there are enough GKs to go around).
+ * >= 5v5 (GK priority ON):
+ *   - Up to 1 GK per team is guaranteed a spot regardless of level
+ *   - GKs are drafted first (1 per team), then outfield by level
+ *
+ * < 5v5 (GK priority OFF):
+ *   - Outfield players fill team slots first; GKs only get remaining spots
+ *   - GKs are drafted last, after all outfield players
  */
 export function snakeDraft(players, playersPerTeam) {
-  const nTeams  = Math.floor(players.length / playersPerTeam);
-  const byLevel = [...players].sort((a, b) => b.level - a.level);
-  const inPlay  = byLevel.slice(0, nTeams * playersPerTeam);
-  const reserves = byLevel.slice(nTeams * playersPerTeam);
+  const nTeams     = Math.floor(players.length / playersPerTeam);
+  const totalSlots = nTeams * playersPerTeam;
+  const gkPriority = playersPerTeam >= 5;
+
+  const gks      = [...players].filter(p => p.position === 'GK').sort((a, b) => b.level - a.level);
+  const outfield = [...players].filter(p => p.position !== 'GK').sort((a, b) => b.level - a.level);
+
+  let inPlayGks, inPlayOutfield, reserves;
+
+  if (gkPriority) {
+    // GKs get guaranteed slots (up to 1 per team), outfield fills the rest
+    inPlayGks      = gks.slice(0, Math.min(gks.length, nTeams));
+    inPlayOutfield = outfield.slice(0, totalSlots - inPlayGks.length);
+    reserves       = [
+      ...gks.slice(inPlayGks.length),
+      ...outfield.slice(inPlayOutfield.length),
+    ].sort((a, b) => b.level - a.level);
+  } else {
+    // Outfield fills slots first; GKs only get what's left
+    inPlayOutfield = outfield.slice(0, Math.min(outfield.length, totalSlots));
+    inPlayGks      = gks.slice(0, totalSlots - inPlayOutfield.length);
+    reserves       = [
+      ...outfield.slice(inPlayOutfield.length),
+      ...gks.slice(inPlayGks.length),
+    ].sort((a, b) => b.level - a.level);
+  }
 
   const teams = Array.from({ length: nTeams }, (_, i) => ({
     id:      i,
@@ -21,15 +46,16 @@ export function snakeDraft(players, playersPerTeam) {
     players: [],
   }));
 
-  const gks     = inPlay.filter(p => p.position === 'GK').sort((a, b) => b.level - a.level);
-  const outfield = inPlay.filter(p => p.position !== 'GK').sort((a, b) => b.level - a.level);
-
-  // Pass 1: assign at most 1 GK per team
-  _snakeInto(teams, gks.slice(0, nTeams));
-
-  // Pass 2: overflow GKs + outfield, re-sorted by level
-  const rest = [...gks.slice(nTeams), ...outfield].sort((a, b) => b.level - a.level);
-  _snakeInto(teams, rest);
+  if (gkPriority) {
+    // Draft GKs first (1 per team), then outfield + overflow GKs by level
+    _snakeInto(teams, inPlayGks);
+    const rest = [...inPlayOutfield].sort((a, b) => b.level - a.level);
+    _snakeInto(teams, rest);
+  } else {
+    // Draft outfield first by level, GKs fill remaining slots last
+    _snakeInto(teams, inPlayOutfield);
+    _snakeInto(teams, inPlayGks);
+  }
 
   return { teams, reserves };
 }

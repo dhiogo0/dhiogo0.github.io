@@ -2,9 +2,8 @@ import { store, presentPlayers }        from '../state/store.js';
 import { POSITIONS }                    from '../data/constants.js';
 import { escHtml, posIcon, posLabel, starsDisplay, starsInput } from '../utils/helpers.js';
 
-export function renderPlayers() {
-  const { form, editId, players, starHover } = store;
-  const presentCount = presentPlayers().length;
+function _formFields() {
+  const { form, starHover } = store;
 
   const posButtons = POSITIONS.map(p => `
     <button
@@ -15,7 +14,51 @@ export function renderPlayers() {
     </button>
   `).join('');
 
-  const allPresent = players.every(p => p.present !== false);
+  return `
+    <div class="field">
+      <label class="field__label" for="nameInput">Nome</label>
+      <input
+        class="input"
+        id="nameInput"
+        type="text"
+        placeholder="Nome do jogador..."
+        value="${escHtml(form.name)}"
+        oninput="App.setFormField('name',this.value)"
+        onkeydown="if(event.key==='Enter')App.addOrUpdatePlayer()"/>
+    </div>
+
+    <div class="field">
+      <label class="field__label">Posição</label>
+      <div class="pos-grid">${posButtons}</div>
+    </div>
+
+    <div class="field">
+      <label class="field__label">Nível de habilidade</label>
+      ${starsInput(form.level, starHover)}
+    </div>
+  `;
+}
+
+export function renderAddPlayer() {
+  return `
+    <div class="fade-up">
+      <div class="card">
+        <p class="card__headline">+ ADICIONAR JOGADOR</p>
+        ${_formFields()}
+        <div class="btn-row">
+          <button class="btn btn--primary" onclick="App.addOrUpdatePlayer()">
+            Adicionar jogador
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+export function renderPlayersList() {
+  const { editModal, confirmDeleteId, players } = store;
+  const presentCount = presentPlayers().length;
+  const allPresent   = players.every(p => p.present !== false);
 
   const playersList = players.length === 0
     ? `<div class="empty-state">
@@ -43,49 +86,51 @@ export function renderPlayers() {
             onclick="App.editPlayer(${p.id})">✏️</button>
           <button class="icon-btn icon-btn--danger" aria-label="Remover ${escHtml(p.name)}"
             data-tooltip="Remover"
-            onclick="App.removePlayer(${p.id})">🗑️</button>
+            onclick="App.confirmRemovePlayer(${p.id})">🗑️</button>
         </div>
       `}).join('');
 
-  return `
-    <div class="fade-up">
-      <div class="card" style="margin-bottom:18px">
-        <p class="card__headline">
-          ${editId !== null ? '✏️ EDITAR JOGADOR' : '➕ ADICIONAR JOGADOR'}
+  const confirmPlayer = confirmDeleteId !== null
+    ? players.find(p => p.id === confirmDeleteId)
+    : null;
+
+  const confirmModal = confirmPlayer ? `
+    <div class="modal-backdrop" onclick="App.cancelRemovePlayer()">
+      <div class="modal modal--sm" onclick="event.stopPropagation()">
+        <p class="modal__title">Remover jogador?</p>
+        <p class="modal__body">
+          <strong>${escHtml(confirmPlayer.name)}</strong> será removido da lista permanentemente.
         </p>
-
-        <div class="field">
-          <label class="field__label" for="nameInput">Nome</label>
-          <input
-            class="input"
-            id="nameInput"
-            type="text"
-            placeholder="Nome do jogador..."
-            value="${escHtml(form.name)}"
-            oninput="App.setFormField('name',this.value)"
-            onkeydown="if(event.key==='Enter')App.addOrUpdatePlayer()"/>
-        </div>
-
-        <div class="field">
-          <label class="field__label">Posição</label>
-          <div class="pos-grid">${posButtons}</div>
-        </div>
-
-        <div class="field">
-          <label class="field__label">Nível de habilidade</label>
-          ${starsInput(form.level, starHover)}
-        </div>
-
-        <div class="btn-row">
-          <button class="btn btn--primary" onclick="App.addOrUpdatePlayer()">
-            ${editId !== null ? 'Salvar alterações' : 'Adicionar jogador'}
+        <div class="btn-row" style="margin-top:18px">
+          <button class="btn btn--primary btn--danger" onclick="App.removePlayer(${confirmPlayer.id})">
+            Remover
           </button>
-          ${editId !== null
-            ? `<button class="btn btn--ghost btn--sm" data-tooltip="Cancelar edição" onclick="App.cancelEdit()">✕</button>`
-            : ''}
+          <button class="btn btn--ghost btn--sm" onclick="App.cancelRemovePlayer()">Cancelar</button>
         </div>
       </div>
+    </div>
+  ` : '';
 
+  const modal = editModal ? `
+    <div class="modal-backdrop" onclick="App.closeEditModal()">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal__header">
+          <p class="card__headline" style="margin-bottom:0">✏️ EDITAR JOGADOR</p>
+          <button class="icon-btn" aria-label="Fechar" onclick="App.closeEditModal()">✕</button>
+        </div>
+        ${_formFields()}
+        <div class="btn-row">
+          <button class="btn btn--primary" onclick="App.addOrUpdatePlayer()">
+            Salvar alterações
+          </button>
+          <button class="btn btn--ghost btn--sm" onclick="App.closeEditModal()">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  ` : '';
+
+  return `
+    <div class="fade-up">
       <div class="section-title">
         <span>Jogadores</span>
         <span class="badge">${players.length}</span>
@@ -103,14 +148,8 @@ export function renderPlayers() {
       ` : ''}
 
       ${playersList}
-
-      ${players.length >= 4
-        ? `<div style="margin-top:18px">
-             <button class="btn btn--primary" onclick="App.goTo('draw')">
-               Configurar Sorteio →
-             </button>
-           </div>`
-        : ''}
     </div>
+    ${confirmModal}
+    ${modal}
   `;
 }

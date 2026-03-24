@@ -6,6 +6,12 @@ export function renderBottomNav() {
 
   const items = [
     {
+      id:       'add',
+      icon:     '➕',
+      label:    'Adicionar',
+      disabled: false,
+    },
+    {
       id:       'players',
       icon:     '👥',
       label:    'Jogadores',
@@ -48,9 +54,10 @@ export function renderBottomNav() {
 
 function _activeSection() {
   const { step } = store;
-  if (step === 0)                return 'players';
-  if (step >= 1 && step <= 3)   return 'draw';
-  if (step === 4)                return 'history';
-  if (step === 5)                return 'profile';
-  return 'players';
+  if (step === 0)              return 'add';
+  if (step === 6)              return 'players';
+  if (step >= 1 && step <= 3) return 'draw';
+  if (step === 4)              return 'history';
+  if (step === 5)              return 'profile';
+  return 'add';
 }

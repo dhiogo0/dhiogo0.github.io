@@ -11,6 +11,8 @@ export const store = {
   players:         loadPlayers(),
   form:            { ...INITIAL_FORM },
   editId:          null,
+  editModal:       false,
+  confirmDeleteId: null,
   playersPerTeam:  _savedProfile.defaultPlayersPerTeam || 5,
   teams:           [],
   reserves:        [],
@@ -77,7 +79,8 @@ export function addOrUpdatePlayer() {
     store.players = store.players.map(p =>
       p.id === store.editId ? { ...p, name: name.trim(), position, level } : p
     );
-    store.editId = null;
+    store.editId    = null;
+    store.editModal = false;
     showToast('Jogador atualizado!');
   } else {
     store.players.push({ id: Date.now(), name: name.trim(), position, level });
@@ -89,13 +92,15 @@ export function addOrUpdatePlayer() {
 }
 
 export function startEditPlayer(player) {
-  store.form   = { name: player.name, position: player.position, level: player.level };
-  store.editId = player.id;
+  store.form      = { name: player.name, position: player.position, level: player.level };
+  store.editId    = player.id;
+  store.editModal = true;
 }
 
 export function cancelEdit() {
-  store.editId = null;
-  store.form   = { ...INITIAL_FORM };
+  store.editId    = null;
+  store.editModal = false;
+  store.form      = { ...INITIAL_FORM };
 }
 
 export function removePlayer(id) {

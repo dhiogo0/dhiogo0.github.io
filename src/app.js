@@ -28,7 +28,7 @@ import { renderStarsWidget } from './utils/helpers.js';
 import { showToast }         from './utils/toast.js';
 import { renderHeader }      from './components/header.js';
 import { renderBottomNav }   from './components/bottomnav.js';
-import { renderPlayers }     from './components/players.js';
+import { renderAddPlayer, renderPlayersList } from './components/players.js';
 import { renderConfig }      from './components/config.js';
 import { renderDrawing }     from './components/drawing.js';
 import { renderTeams }       from './components/teams.js';
@@ -57,12 +57,13 @@ function render() {
   const { step } = store;
 
   let content = '';
-  if      (step === 0) content = renderPlayers();
+  if      (step === 0) content = renderAddPlayer();
   else if (step === 1) content = renderConfig();
   else if (step === 2) content = renderDrawing();
   else if (step === 3) content = renderTeams();
   else if (step === 4) content = renderHistory();
   else if (step === 5) content = renderProfile();
+  else if (step === 6) content = renderPlayersList();
 
   const isAnimating = step === 2;
 
@@ -71,10 +72,10 @@ function render() {
     `<main class="screen">${content}</main>` +
     (isAnimating ? '' : renderBottomNav());
 
-  /* Auto-focus player name input when editing */
-  if (step === 0) {
+  /* Auto-focus player name input when editing modal is open */
+  if (step === 6 && store.editModal) {
     const inp = document.getElementById('nameInput');
-    if (inp && store.editId !== null) {
+    if (inp) {
       inp.focus();
       inp.setSelectionRange(inp.value.length, inp.value.length);
     }
@@ -93,8 +94,11 @@ window.App = {
 
   goTo(section) {
     switch (section) {
-      case 'players':
+      case 'add':
         setStep(0);
+        break;
+      case 'players':
+        setStep(6);
         break;
       case 'draw':
         if (store.players.length < 2 && !store.teams.length) return;
@@ -142,12 +146,23 @@ window.App = {
     render();
   },
 
-  cancelEdit() {
+  closeEditModal() {
     cancelEdit();
     render();
   },
 
+  confirmRemovePlayer(id) {
+    store.confirmDeleteId = id;
+    render();
+  },
+
+  cancelRemovePlayer() {
+    store.confirmDeleteId = null;
+    render();
+  },
+
   removePlayer(id) {
+    store.confirmDeleteId = null;
     removePlayer(id);
     render();
     _syncToCloud();
@@ -155,11 +170,13 @@ window.App = {
 
   togglePresence(id) {
     togglePresence(id);
+    savePlayers(store.players);
     render();
   },
 
   toggleAllPresence() {
     toggleAllPresence();
+    savePlayers(store.players);
     render();
   },
 
