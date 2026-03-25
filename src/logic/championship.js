@@ -161,6 +161,15 @@ function _propagate(matches, done) {
   }
 }
 
+export function repropagateKnockout(championship) {
+  if (championship.format !== 'knockout') return;
+  for (const m of championship.matches) {
+    if (m.status === 'done' && m.winnerId) {
+      _propagate(championship.matches, m);
+    }
+  }
+}
+
 function _checkFinished(championship) {
   const { format, matches } = championship;
   let isDone;

@@ -8,6 +8,7 @@ import {
   registerScore,
   registerSequentialResult,
   finishSequentialChampionship,
+  repropagateKnockout,
 } from '../logic/championship.js';
 import { snakeDraft }  from '../logic/balance.js';
 import { showToast }   from '../utils/toast.js';
@@ -15,6 +16,8 @@ import { showToast }   from '../utils/toast.js';
 const INITIAL_FORM = { name: '', position: 'MID', level: 3 };
 
 const _savedProfile = loadProfile();
+const _savedChampionship = loadChampionship();
+if (_savedChampionship) repropagateKnockout(_savedChampionship);
 
 export const store = {
   step:            0,
@@ -37,7 +40,7 @@ export const store = {
   renamingTeamId:      null,
   drawHistory:         loadHistory(),
   currentUser:         null,
-  championship:          loadChampionship(),
+  championship:          _savedChampionship,
   championshipHistory:   loadChampionshipHistory(),
   championshipModal:     false,
   championshipFormat:    'round-robin',
@@ -328,6 +331,7 @@ export function createChampionshipFromDraw() {
 export function registerMatchScore(matchId, homeScore, awayScore, penalties = null) {
   if (!store.championship) return;
   registerScore(store.championship, matchId, homeScore, awayScore, penalties);
+  repropagateKnockout(store.championship);
   store.scoringMatchId = null;
   store.penaltyMatchId = null;
   store.pendingScore   = null;
