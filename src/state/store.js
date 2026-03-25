@@ -214,8 +214,16 @@ export function clickTeamPlayer(teamId, playerId) {
   if (!p1 || !p2) { store.swapSelected = null; return; }
 
   _snapshot();
-  t1.players = t1.players.map(p => p.id === sel.playerId ? { ...p2 } : p);
-  t2.players = t2.players.map(p => p.id === playerId     ? { ...p1 } : p);
+  if (t1 === t2) {
+    const arr  = [...t1.players];
+    const idx1 = arr.findIndex(p => p.id === sel.playerId);
+    const idx2 = arr.findIndex(p => p.id === playerId);
+    [arr[idx1], arr[idx2]] = [arr[idx2], arr[idx1]];
+    t1.players = arr;
+  } else {
+    t1.players = t1.players.map(p => p.id === sel.playerId ? { ...p2 } : p);
+    t2.players = t2.players.map(p => p.id === playerId     ? { ...p1 } : p);
+  }
   store.swapSelected = null;
   showToast('Troca feita!');
 }
