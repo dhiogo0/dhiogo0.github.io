@@ -828,6 +828,14 @@ html, body {
 .score-input:focus { border-color: rgba(0,232,122,0.5); }
 .score-form__actions { display: flex; gap: 8px; }
 .score-form__actions .btn--primary { width: auto; }
+.score-form__penalty-header {
+  font-size: 12px; font-weight: 600; color: var(--green);
+  text-align: center; margin-bottom: 10px; letter-spacing: 0.5px;
+}
+.match-penalties {
+  display: block; font-size: 11px; font-weight: 500;
+  color: var(--dimmed); letter-spacing: 0.3px;
+}
 
 /* ── Championship CTA (on teams screen) ── */
 .champ-cta { margin-top: 20px; text-align: center; }

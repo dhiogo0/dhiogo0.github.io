@@ -40,6 +40,8 @@ export const store = {
   championshipModal:     false,
   championshipFormat:    'round-robin',
   scoringMatchId:        null,
+  penaltyMatchId:        null,
+  pendingScore:          null,
   confirmEndChampionship: false,
   championshipUndo:      null,
   profile: {
@@ -284,10 +286,12 @@ export function createChampionshipFromDraw() {
   setStep(4);
 }
 
-export function registerMatchScore(matchId, homeScore, awayScore) {
+export function registerMatchScore(matchId, homeScore, awayScore, penalties = null) {
   if (!store.championship) return;
-  registerScore(store.championship, matchId, homeScore, awayScore);
+  registerScore(store.championship, matchId, homeScore, awayScore, penalties);
   store.scoringMatchId = null;
+  store.penaltyMatchId = null;
+  store.pendingScore   = null;
   saveChampionship(store.championship);
 
   if (store.championship.status === 'finished') {
@@ -301,6 +305,17 @@ export function setScoringMatch(matchId) {
 
 export function cancelScoringMatch() {
   store.scoringMatchId = null;
+}
+
+export function setPenaltyMatch(matchId, homeScore, awayScore) {
+  store.penaltyMatchId = matchId;
+  store.pendingScore   = { homeScore, awayScore };
+  store.scoringMatchId = null;
+}
+
+export function clearPenaltyMatch() {
+  store.penaltyMatchId = null;
+  store.pendingScore   = null;
 }
 
 export function registerSequentialResultAction(result) {

@@ -28,6 +28,8 @@ import {
   registerMatchScore,
   setScoringMatch,
   cancelScoringMatch,
+  setPenaltyMatch,
+  clearPenaltyMatch,
   archiveAndClearChampionship,
   registerSequentialResultAction,
   requestEndChampionship,
@@ -294,7 +296,34 @@ window.App = {
   confirmScore(matchId) {
     const home = parseInt(document.getElementById(`sh-${matchId}`)?.value ?? 0, 10);
     const away = parseInt(document.getElementById(`sa-${matchId}`)?.value ?? 0, 10);
-    registerMatchScore(matchId, isNaN(home) ? 0 : home, isNaN(away) ? 0 : away);
+    const homeScore = isNaN(home) ? 0 : home;
+    const awayScore = isNaN(away) ? 0 : away;
+
+    const match = store.championship?.matches.find(m => m.id === matchId);
+    if (match && match.phase !== 'group' && homeScore === awayScore) {
+      setPenaltyMatch(matchId, homeScore, awayScore);
+      render();
+      return;
+    }
+
+    registerMatchScore(matchId, homeScore, awayScore);
+    render();
+  },
+
+  confirmPenalties(matchId) {
+    const homePen = parseInt(document.getElementById(`php-${matchId}`)?.value ?? 0, 10);
+    const awayPen = parseInt(document.getElementById(`pap-${matchId}`)?.value ?? 0, 10);
+    if (isNaN(homePen) || isNaN(awayPen) || homePen === awayPen) {
+      showToast('Pênaltis precisam ter um vencedor!', 'error');
+      return;
+    }
+    const { homeScore, awayScore } = store.pendingScore;
+    registerMatchScore(matchId, homeScore, awayScore, { home: homePen, away: awayPen });
+    render();
+  },
+
+  cancelPenalties() {
+    clearPenaltyMatch();
     render();
   },
 

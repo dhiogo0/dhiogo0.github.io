@@ -257,7 +257,7 @@ function _renderStandings(c) {
 /* ── Match list ── */
 
 function _renderMatchList(c, readonly, timerRunning = false) {
-  const { scoringMatchId } = store;
+  const { scoringMatchId, penaltyMatchId } = store;
   const groups = {};
 
   for (const m of c.matches) {
@@ -270,11 +270,11 @@ function _renderMatchList(c, readonly, timerRunning = false) {
     .sort((a, b) => _groupSortKey(a[0]) - _groupSortKey(b[0]))
     .map(([label, matches]) => `
       <div class="section-title" style="margin-bottom:8px"><span>${label}</span></div>
-      ${matches.map(m => _renderMatchCard(c, m, readonly, scoringMatchId, timerRunning)).join('')}
+      ${matches.map(m => _renderMatchCard(c, m, readonly, scoringMatchId, timerRunning, penaltyMatchId)).join('')}
     `).join('');
 }
 
-function _renderMatchCard(c, m, readonly, scoringId, timerRunning = false) {
+function _renderMatchCard(c, m, readonly, scoringId, timerRunning = false, penaltyMatchId = null) {
   const home  = c.teams.find(t => t.id === m.homeTeamId);
   const away  = c.teams.find(t => t.id === m.awayTeamId);
   const homeN = home ? escHtml(home.name) : 'A definir';
@@ -292,16 +292,39 @@ function _renderMatchCard(c, m, readonly, scoringId, timerRunning = false) {
   }
 
   if (m.status === 'done') {
-    const homeWon = m.homeScore > m.awayScore;
-    const awayWon = m.awayScore > m.homeScore;
+    const homeWon = m.winnerId === m.homeTeamId;
+    const awayWon = m.winnerId === m.awayTeamId;
+    const penLabel = m.homePenalties != null
+      ? `<span class="match-penalties">(pen. ${m.homePenalties}–${m.awayPenalties})</span>`
+      : '';
     return `
       <div class="match-card match-card--done">
         <span class="match-team ${homeWon ? 'match-team--winner' : ''}">${homeDot}${homeN}</span>
-        <span class="match-scoreline">${m.homeScore} × ${m.awayScore}</span>
+        <span class="match-scoreline">${m.homeScore} × ${m.awayScore}${penLabel}</span>
         <span class="match-team match-team--right ${awayWon ? 'match-team--winner' : ''}">${awayN}${awayDot}</span>
         ${!readonly && !timerRunning && m.phase === 'group'
           ? `<button class="btn btn--ghost btn--sm match-edit-btn" onclick="App.startScore(${m.id})">✏️</button>`
           : ''}
+      </div>
+    `;
+  }
+
+  // pending — pênaltis?
+  if (penaltyMatchId === m.id) {
+    return `
+      <div class="match-card match-card--scoring">
+        <p class="score-form__penalty-header">⚽ Empate! Definir por pênaltis</p>
+        <div class="score-form">
+          <span class="score-form__team">${homeDot}${homeN}</span>
+          <input type="number" class="score-input" id="php-${m.id}" min="0" max="99" value="0" />
+          <span class="score-form__sep">×</span>
+          <input type="number" class="score-input" id="pap-${m.id}" min="0" max="99" value="0" />
+          <span class="score-form__team">${awayDot}${awayN}</span>
+        </div>
+        <div class="score-form__actions">
+          <button class="btn btn--ghost btn--sm" onclick="App.cancelPenalties()">Cancelar</button>
+          <button class="btn btn--primary btn--sm" onclick="App.confirmPenalties(${m.id})">Confirmar</button>
+        </div>
       </div>
     `;
   }

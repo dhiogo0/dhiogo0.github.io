@@ -109,16 +109,23 @@ export function generateGroupsAndFinal(teams) {
 
 /* ── Register score ── */
 
-export function registerScore(championship, matchId, homeScore, awayScore) {
+export function registerScore(championship, matchId, homeScore, awayScore, penalties = null) {
   const m = championship.matches.find(x => x.id === matchId);
   if (!m || m.status === 'done') return;
 
   m.homeScore  = homeScore;
   m.awayScore  = awayScore;
   m.status     = 'done';
-  m.winnerId   = homeScore > awayScore ? m.homeTeamId
+
+  if (penalties) {
+    m.homePenalties = penalties.home;
+    m.awayPenalties = penalties.away;
+    m.winnerId = penalties.home > penalties.away ? m.homeTeamId : m.awayTeamId;
+  } else {
+    m.winnerId = homeScore > awayScore ? m.homeTeamId
                : awayScore > homeScore ? m.awayTeamId
                : null;
+  }
 
   if (championship.format === 'knockout') {
     _propagate(championship.matches, m);
