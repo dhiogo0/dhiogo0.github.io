@@ -327,6 +327,14 @@ window.App = {
     render();
   },
 
+  newDraw() {
+    store.teams    = [];
+    store.reserves = [];
+    store.history  = [];
+    setStep(0);
+    render();
+  },
+
   newChampionship() {
     archiveAndClearChampionship();
     render();

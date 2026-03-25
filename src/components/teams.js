@@ -58,7 +58,8 @@ function _renderActions(swapMode, history) {
         onclick="App.exportWhatsapp()">
         📤 Zap
       </button>
-      <button class="btn btn--ghost btn--sm" data-tooltip="Fazer novo sorteio" onclick="App.setStep(1)">🔁</button>
+      <button class="btn btn--ghost btn--sm" data-tooltip="Reconfigurar e sortear novamente" onclick="App.setStep(1)">🔁</button>
+      <button class="btn btn--ghost btn--sm" data-tooltip="Novo sorteio do zero" onclick="App.newDraw()">🏠</button>
     </div>
   `;
 }
