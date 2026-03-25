@@ -128,7 +128,7 @@ window.App = {
         break;
       case 'draw':
         if (store.players.length < 2 && !store.teams.length) return;
-        setStep(store.teams.length ? 3 : 1);
+        setStep(!store.readOnly && store.teams.length ? 3 : 1);
         break;
       case 'championship':
         setStep(4);

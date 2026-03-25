@@ -94,6 +94,7 @@ export function setStep(n) {
   store.swapMode       = false;
   store.swapSelected   = null;
   store.renamingTeamId = null;
+  store.readOnly       = false;
 }
 
 export function setFormField(key, value) {
