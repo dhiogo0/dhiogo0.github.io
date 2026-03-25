@@ -970,19 +970,23 @@ html, body {
   font-size: 13px; font-weight: 700; letter-spacing: 1.2px;
   color: var(--muted);
 }
-.timer-presets { display: flex; gap: 5px; }
-.timer-preset {
-  padding: 4px 9px; border-radius: 7px;
+.timer-duration-picker {
+  display: flex; align-items: center; gap: 6px;
+}
+.timer-dur-btn {
+  width: 28px; height: 28px; border-radius: 8px;
   border: 1px solid var(--border); background: var(--glass);
-  color: var(--dimmed); font-size: 11px; font-weight: 600;
-  cursor: pointer; font-family: var(--font-body); transition: all 0.14s;
+  color: var(--text); font-size: 16px; line-height: 1;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 0.14s;
 }
-.timer-preset--active {
-  border-color: var(--green);
-  background: rgba(0,232,122,0.1);
-  color: var(--green);
+.timer-dur-btn:disabled { opacity: 0.3; cursor: default; }
+.timer-dur-btn:not(:disabled):hover { background: var(--glass2); }
+.timer-dur-val {
+  font-family: var(--font-display); font-size: 15px; font-weight: 700;
+  color: var(--text); min-width: 44px; text-align: center;
 }
-.timer-preset:disabled { opacity: 0.35; cursor: default; }
+.timer-dur-unit { font-size: 11px; color: var(--dimmed); margin-left: 2px; font-family: var(--font-body); }
 .timer-display {
   font-family: var(--font-display);
   font-size: 58px; font-weight: 800;

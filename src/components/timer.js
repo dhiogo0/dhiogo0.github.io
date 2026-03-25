@@ -1,18 +1,23 @@
 /* ── Timer state (module-level to survive re-renders) ── */
-let _duration   = 10 * 60; // seconds
+const _STORAGE_KEY = 'racha_timer_duration';
+const _DEFAULT_SECS = 10 * 60;
+
+function _loadDuration() {
+  const saved = parseInt(localStorage.getItem(_STORAGE_KEY));
+  return saved > 0 ? saved : _DEFAULT_SECS;
+}
+
+function _saveDuration(secs) {
+  localStorage.setItem(_STORAGE_KEY, secs);
+}
+
+let _duration   = _loadDuration();
 let _timeLeft   = _duration;
 let _running    = false;
 let _intervalId = null;
 let _finished   = false;
 let _startedAt  = null; // timestamp real para corrigir throttle de background
 let _audioCtx   = null; // contexto criado no gesto do usuário para desbloquear no iOS
-
-const PRESETS = [
-  { label: '5m',  val: 5  * 60 },
-  { label: '10m', val: 10 * 60 },
-  { label: '15m', val: 15 * 60 },
-  { label: '20m', val: 20 * 60 },
-];
 
 function _fmt(secs) {
   const m = Math.floor(secs / 60).toString().padStart(2, '0');
@@ -142,13 +147,15 @@ export function timerReset() {
 }
 
 export function timerSetDuration(secs) {
+  const val   = Math.max(60, Math.min(secs, 99 * 60)); // entre 1 e 99 min
   clearInterval(_intervalId);
   _intervalId = null;
   _running    = false;
   _finished   = false;
   _startedAt  = null;
-  _duration   = secs;
-  _timeLeft   = secs;
+  _duration   = val;
+  _timeLeft   = val;
+  _saveDuration(val);
   window.App?.render();
 }
 
@@ -159,13 +166,17 @@ export function renderTimer() {
   const isUrgent = pct < 20 && pct > 0 && !_finished;
   const color    = _finished ? '#ef4444' : isUrgent ? '#f97316' : 'var(--green)';
 
-  const presetBtns = PRESETS.map(p => {
-    const isActive = _duration === p.val && _timeLeft === p.val && !_running;
-    return `<button
-      class="timer-preset ${isActive ? 'timer-preset--active' : ''}"
-      onclick="App.timerSetDuration(${p.val})"
-      ${_running ? 'disabled' : ''}>${p.label}</button>`;
-  }).join('');
+  const mins    = Math.round(_duration / 60);
+  const canEdit = !_running && !_finished;
+
+  const durationPicker = `
+    <div class="timer-duration-picker">
+      <button class="timer-dur-btn" onclick="App.timerSetDuration(${_duration - 60})"
+        ${!canEdit || mins <= 1 ? 'disabled' : ''}>−</button>
+      <span class="timer-dur-val">${mins}<span class="timer-dur-unit">min</span></span>
+      <button class="timer-dur-btn" onclick="App.timerSetDuration(${_duration + 60})"
+        ${!canEdit || mins >= 99 ? 'disabled' : ''}>+</button>
+    </div>`;
 
   const ctrlBtn = _finished
     ? `<button class="btn btn--sm timer-btn-main timer-btn-finished" onclick="App.timerReset()">Fim de Jogo! — Resetar</button>`
@@ -177,7 +188,7 @@ export function renderTimer() {
     <div class="timer-card ${_finished ? 'timer-card--finished' : ''}">
       <div class="timer-card__header">
         <span class="timer-card__title">CRONOMETRO</span>
-        <div class="timer-presets">${presetBtns}</div>
+        ${durationPicker}
       </div>
       <div class="timer-display" style="color:${color}">${_fmt(_timeLeft)}</div>
       <div class="timer-progress">
