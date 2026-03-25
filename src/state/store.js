@@ -28,6 +28,7 @@ export const store = {
   confirmDeleteId: null,
   importModal:      false,
   importCandidates: [],
+  pasteModal:       false,
   playersPerTeam:  _savedProfile.defaultPlayersPerTeam || 5,
   teams:           [],
   reserves:        [],
@@ -479,6 +480,25 @@ export function parsePlayersText(text) {
     const [name, position, level] = line.split('|');
     return { name: name?.trim(), position: position?.trim() || 'MID', level: parseInt(level) || 3 };
   }).filter(p => p.name);
+}
+
+export function openPasteModal() {
+  store.pasteModal = true;
+}
+
+export function closePasteModal() {
+  store.pasteModal = false;
+}
+
+export function copyPlayerNames() {
+  if (!store.players.length) {
+    showToast('Nenhum jogador para copiar.', 'error');
+    return;
+  }
+  const text = store.players.map(p => p.name).join('\n');
+  navigator.clipboard.writeText(text)
+    .then(() => showToast('Nomes copiados!'))
+    .catch(() => showToast('Erro ao copiar.', 'error'));
 }
 
 export function openImportModal(players) {

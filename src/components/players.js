@@ -55,6 +55,35 @@ export function renderAddPlayer() {
   `;
 }
 
+export function renderPasteModal() {
+  return `
+    <div class="modal-backdrop" onclick="App.closePasteModal()">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal__header">
+          <p class="card__headline" style="margin-bottom:0">📋 COLAR LISTA</p>
+          <button class="icon-btn" aria-label="Fechar" onclick="App.closePasteModal()">✕</button>
+        </div>
+        <p class="modal__body" style="margin-bottom:8px">Um nome por linha:</p>
+        <textarea
+          id="pasteTextarea"
+          class="input"
+          rows="8"
+          placeholder="João&#10;Pedro&#10;Lucas&#10;Maria..."
+          style="resize:vertical;font-size:.95em"></textarea>
+        <div class="btn-row" style="margin-top:14px;flex-direction:column;gap:8px">
+          <button class="btn btn--primary" onclick="App.confirmPaste('replace')">
+            Substituir minha lista
+          </button>
+          <button class="btn btn--ghost" onclick="App.confirmPaste('merge')">
+            Adicionar à lista atual
+          </button>
+          <button class="btn btn--ghost btn--sm" onclick="App.closePasteModal()">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 export function renderPlayersList() {
   const { editModal, confirmDeleteId, players } = store;
   const presentCount = presentPlayers().length;
@@ -129,20 +158,28 @@ export function renderPlayersList() {
     </div>
   ` : '';
 
+  const pasteModalHtml = store.pasteModal ? renderPasteModal() : '';
+
   return `
     <div class="fade-up">
       <div class="section-title" style="display:flex;align-items:center;gap:8px">
         <span>Jogadores</span>
         <span class="badge">${players.length}</span>
-        <span style="margin-left:auto;display:flex;gap:6px">
-          <button class="btn btn--ghost btn--sm" onclick="document.getElementById('importFileInput').click()">
-            📥 Importar
+        <span style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
+          <button class="btn btn--ghost btn--sm" onclick="App.openPasteModal()">
+            📋 Colar
           </button>
           ${players.length > 0 ? `
+            <button class="btn btn--ghost btn--sm" onclick="App.copyPlayerNames()">
+              📋 Copiar nomes
+            </button>
             <button class="btn btn--ghost btn--sm" onclick="App.exportPlayersFile()">
               📤 Exportar
             </button>
           ` : ''}
+          <button class="btn btn--ghost btn--sm" onclick="document.getElementById('importFileInput').click()">
+            📥 Importar
+          </button>
         </span>
         <input id="importFileInput" type="file" accept=".txt" style="display:none"
           onchange="App.importFile(this.files[0]);this.value=''">
@@ -163,6 +200,7 @@ export function renderPlayersList() {
     </div>
     ${confirmModal}
     ${modal}
+    ${pasteModalHtml}
   `;
 }
 

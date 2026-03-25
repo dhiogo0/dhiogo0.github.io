@@ -42,6 +42,9 @@ import {
   openImportModal,
   closeImportModal,
   confirmImport,
+  openPasteModal,
+  closePasteModal,
+  copyPlayerNames,
 } from './state/store.js';
 
 import { savePlayers, saveHistory, saveProfile } from './utils/storage.js';
@@ -408,6 +411,30 @@ window.App = {
 
   closeImportModal() {
     closeImportModal();
+    render();
+  },
+
+  openPasteModal() {
+    openPasteModal();
+    render();
+  },
+
+  closePasteModal() {
+    closePasteModal();
+    render();
+  },
+
+  copyPlayerNames,
+
+  confirmPaste(mode) {
+    const text = document.getElementById('pasteTextarea')?.value || '';
+    const players = parsePlayersText(text);
+    if (!players.length) {
+      showToast('Nenhum nome encontrado.', 'error');
+      return;
+    }
+    closePasteModal();
+    openImportModal(players);
     render();
   },
 
