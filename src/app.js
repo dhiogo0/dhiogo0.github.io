@@ -384,15 +384,18 @@ window.App = {
 /* ── Auth state listener ── */
 onAuthChange(async (user) => {
   store.currentUser = user;
+  render(); // atualiza botão imediatamente ao mudar estado de auth
 
   if (user) {
     try {
       const cloudData = await loadUserData(user.uid);
       if (cloudData) {
-        if (cloudData.players?.length)  store.players     = cloudData.players;
+        if (cloudData.players?.length) {
+          store.players = cloudData.players.map(p => ({ ...p, present: p.present !== false }));
+        }
         if (cloudData.history?.length)  store.drawHistory = cloudData.history;
         if (cloudData.profile) {
-          store.profile       = { ...store.profile, ...cloudData.profile };
+          store.profile        = { ...store.profile, ...cloudData.profile };
           store.playersPerTeam = store.profile.defaultPlayersPerTeam || 5;
         }
         savePlayers(store.players);
@@ -407,12 +410,12 @@ onAuthChange(async (user) => {
       }
     } catch (err) {
       console.error('Cloud load error:', err);
+      showToast('Erro ao carregar dados da nuvem.', 'error');
     }
     const firstName = user.displayName?.split(' ')[0] || 'jogador';
     showToast(`Bem-vindo, ${firstName}!`);
+    render(); // segundo render com os dados carregados
   }
-
-  render();
 });
 
 /* ── Boot ── */
