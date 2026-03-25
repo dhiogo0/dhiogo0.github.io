@@ -175,7 +175,7 @@ function _renderSeqStandings(c, finished) {
   const playing = finished ? [] : [c.currentHomeId, c.currentAwayId];
 
   return `
-    <div class="section-title" style="margin-bottom:8px"><span>Classificacao</span></div>
+    <div class="section-title" style="margin-bottom:8px"><span>Classificação</span></div>
     <div class="card" style="padding:0;overflow:hidden;margin-bottom:16px">
       <table class="standings-table">
         <thead>
