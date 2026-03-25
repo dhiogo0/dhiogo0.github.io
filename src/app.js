@@ -59,6 +59,7 @@ import { renderProfile }     from './components/profile.js';
 
 import { signInWithGoogle, signOutUser, onAuthChange, handleRedirectResult } from './firebase/auth.js';
 import { loadUserData, saveUserData }                  from './firebase/db.js';
+import { morphHTML }                                   from './utils/morph.js';
 
 /* ── Root element ── */
 const root = document.getElementById('app');
@@ -89,11 +90,13 @@ function render() {
 
   const isAnimating = step === 2;
 
-  root.innerHTML =
+  morphHTML(
+    root,
     renderHeader() +
     `<main class="screen">${content}</main>` +
     (isAnimating ? '' : renderBottomNav()) +
-    (store.importModal ? renderImportModal() : '');
+    (store.importModal ? renderImportModal() : ''),
+  );
 
   /* Auto-focus player name input when editing modal is open */
   if (step === 6 && store.editModal) {
