@@ -617,6 +617,12 @@ html, body {
 }
 [data-tooltip]:hover::after { opacity: 1; }
 
+/* Tooltips em elementos próximos à borda esquerda: alinhar à esquerda */
+.team-card__name--editable[data-tooltip]::after {
+  left: 0;
+  transform: none;
+}
+
 /* ── Presence ── */
 .presence-bar {
   display: flex;
