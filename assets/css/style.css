@@ -617,9 +617,16 @@ html, body {
 }
 [data-tooltip]:hover::after { opacity: 1; }
 
-/* Tooltips em elementos próximos à borda esquerda: alinhar à esquerda */
-.team-card__name--editable[data-tooltip]::after {
+/* Primeiro botão da actions-row: alinhar tooltip à esquerda para não sair da tela */
+.actions-row > :first-child[data-tooltip]::after {
   left: 0;
+  transform: none;
+}
+
+/* icon-btns ficam na borda direita: alinhar tooltip à direita */
+.icon-btn[data-tooltip]::after {
+  left: auto;
+  right: 0;
   transform: none;
 }
 
