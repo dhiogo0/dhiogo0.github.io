@@ -276,6 +276,7 @@ export function createChampionship(teams, format) {
     championId: null,
     createdAt:  new Date().toISOString(),
     finishedAt: null,
+    log:        [],
   };
 
   if (format === 'round-robin') {

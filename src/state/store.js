@@ -300,26 +300,58 @@ export function cancelScoringMatch() {
 
 export function registerSequentialResultAction(result) {
   if (!store.championship) return;
-  const c = store.championship;
+  const c    = store.championship;
+  const home = c.teams.find(t => t.id === c.currentHomeId);
+  const away = c.teams.find(t => t.id === c.currentAwayId);
+
   store.championshipUndo = {
     currentHomeId: c.currentHomeId,
     currentAwayId: c.currentAwayId,
     queue:         [...c.queue],
     matches:       JSON.parse(JSON.stringify(c.matches)),
   };
+
+  if (!c.log) c.log = [];
+  c.log.unshift({
+    type:         'add',
+    at:           Date.now(),
+    homeTeamName: home?.name || '?',
+    awayTeamName: away?.name || '?',
+    result,
+    winner:       result === 'home' ? home?.name
+                : result === 'away' ? away?.name
+                : null,
+    pts:          result === 'draw' ? 1 : 3,
+  });
+
   registerSequentialResult(c, result);
   saveChampionship(c);
 }
 
 export function undoSequentialResult() {
   if (!store.championship || !store.championshipUndo) return;
+  const c    = store.championship;
   const snap = store.championshipUndo;
-  store.championship.currentHomeId = snap.currentHomeId;
-  store.championship.currentAwayId = snap.currentAwayId;
-  store.championship.queue         = snap.queue;
-  store.championship.matches       = snap.matches;
-  store.championshipUndo           = null;
-  saveChampionship(store.championship);
+
+  if (!c.log) c.log = [];
+  const lastAdd = c.log.find(e => e.type === 'add');
+  if (lastAdd) {
+    c.log.unshift({
+      type:         'undo',
+      at:           Date.now(),
+      homeTeamName: lastAdd.homeTeamName,
+      awayTeamName: lastAdd.awayTeamName,
+      result:       lastAdd.result,
+      winner:       lastAdd.winner,
+    });
+  }
+
+  c.currentHomeId        = snap.currentHomeId;
+  c.currentAwayId        = snap.currentAwayId;
+  c.queue                = snap.queue;
+  c.matches              = snap.matches;
+  store.championshipUndo = null;
+  saveChampionship(c);
 }
 
 export function requestEndChampionship() {

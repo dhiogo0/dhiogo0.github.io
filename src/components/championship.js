@@ -136,6 +136,7 @@ function _renderSequential(c) {
         </div>` : ''}
 
       ${_renderSeqStandings(c, false)}
+      ${_renderAuditLog(c)}
 
       <div style="margin-top:16px">
         ${confirmEndChampionship ? `
@@ -335,6 +336,45 @@ function _renderMatchCard(c, m, readonly, scoringId, timerRunning = false) {
         Placar
       </button>
     </div>
+  `;
+}
+
+/* ── Audit Log ── */
+
+function _renderAuditLog(c) {
+  const log = c.log;
+  if (!log?.length) return '';
+
+  const rows = log.map(e => {
+    const time = new Date(e.at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+    let icon, desc;
+    if (e.type === 'undo') {
+      icon = '↩';
+      const orig = e.result === 'draw'
+        ? `Empate ${escHtml(e.homeTeamName)} × ${escHtml(e.awayTeamName)}`
+        : `Vitória de ${escHtml(e.winner)}`;
+      desc = `<span class="audit-undo">Desfeito: ${orig}</span>`;
+    } else if (e.result === 'draw') {
+      icon = '🤝';
+      desc = `Empate: ${escHtml(e.homeTeamName)} × ${escHtml(e.awayTeamName)} <span class="audit-pts">+${e.pts}pt</span>`;
+    } else {
+      icon = '🏆';
+      desc = `${escHtml(e.winner)} venceu <span class="audit-pts">+${e.pts}pts</span>`;
+    }
+
+    return `
+      <div class="audit-row ${e.type === 'undo' ? 'audit-row--undo' : ''}">
+        <span class="audit-icon">${icon}</span>
+        <span class="audit-desc">${desc}</span>
+        <span class="audit-time">${time}</span>
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <div class="section-title" style="margin-top:16px;margin-bottom:8px"><span>Histórico</span></div>
+    <div class="audit-log">${rows}</div>
   `;
 }
 
