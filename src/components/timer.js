@@ -187,7 +187,7 @@ export function renderTimer() {
   return `
     <div class="timer-card ${_finished ? 'timer-card--finished' : ''}">
       <div class="timer-card__header">
-        <span class="timer-card__title">CRONOMETRO</span>
+        <span class="timer-card__title">CRONÔMETRO</span>
         ${durationPicker}
       </div>
       <div class="timer-display" style="color:${color}">${_fmt(_timeLeft)}</div>

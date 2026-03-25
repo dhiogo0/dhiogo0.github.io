@@ -141,7 +141,11 @@ export function updateProfile(key, value) {
   saveProfile(store.profile);
 }
 
+let _drawing = false;
+
 export function draw(onDone) {
+  if (_drawing) return;
+  _drawing = true;
   store.step = 2;
   setTimeout(() => {
     const shuffled = [...presentPlayers()].sort(() => Math.random() - 0.5);
@@ -152,6 +156,7 @@ export function draw(onDone) {
     store.swapMode     = false;
     store.swapSelected = null;
     store.step         = 3;
+    _drawing           = false;
     _pushDrawHistory();
     onDone();
   }, 2200);

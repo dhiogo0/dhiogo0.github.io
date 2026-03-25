@@ -150,7 +150,7 @@ function _renderChampionshipModal(teams, selectedFormat) {
 
   const formats = [
     { id: 'round-robin',      emoji: '⚽', label: 'Pontos Corridos', sub: 'Todos jogam entre si',      ok: n >= 2 },
-    { id: 'knockout',         emoji: '🏆', label: 'Mata-mata',        sub: 'Eliminacao direta',          ok: n >= 2 },
+    { id: 'knockout',         emoji: '🏆', label: 'Mata-mata',        sub: 'Eliminação direta',          ok: n >= 2 },
     { id: 'groups+knockout',  emoji: '🔀', label: 'Pontos + Final',   sub: 'Todos jogam, top 2 decidem', ok: n >= 3 },
   ];
 

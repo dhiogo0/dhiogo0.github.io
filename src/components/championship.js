@@ -30,13 +30,13 @@ function _renderFinished(c) {
   const champion = c.teams.find(t => t.id === c.championId);
   const body = c.format === 'round-robin'
     ? _renderSeqStandings(c, true)
-    : _renderMatchList(c, true);
+    : (c.format === 'groups+knockout' ? _renderStandings(c) : '') + _renderMatchList(c, true);
 
   return `
     <div class="fade-up">
       <div class="champion-banner">
         <div class="champion-banner__trophy">🏆</div>
-        <p class="champion-banner__label">CAMPEAO</p>
+        <p class="champion-banner__label">CAMPEÃO</p>
         <p class="champion-banner__name" style="color:${champion?.color || 'var(--green)'}">
           ${escHtml(champion?.name || '???')}
         </p>
@@ -103,7 +103,7 @@ function _renderSequential(c) {
           </div>
         </div>
         ${timerRunning ? `
-          <div class="timer-blocking-msg">Aguarde o fim do cronometro para registrar o resultado</div>
+          <div class="timer-blocking-msg">Aguarde o fim do cronômetro para registrar o resultado</div>
         ` : `
         <div class="result-btns">
           <button class="result-btn result-btn--win" onclick="App.registerResult('home')"
@@ -123,7 +123,7 @@ function _renderSequential(c) {
         </div>
         ${championshipUndo ? `
           <button class="btn btn--ghost btn--sm seq-undo-btn" onclick="App.undoResult()">
-            ↩ Desfazer ultimo resultado
+            ↩ Desfazer último resultado
           </button>
         ` : ''}
         `}
@@ -141,7 +141,7 @@ function _renderSequential(c) {
       <div style="margin-top:16px">
         ${confirmEndChampionship ? `
           <div class="confirm-end">
-            <p class="confirm-end__text">Encerrar e definir o campeao?</p>
+            <p class="confirm-end__text">Encerrar e definir o campeão?</p>
             <div class="btn-row">
               <button class="btn btn--ghost" style="flex:1" onclick="App.cancelEndChampionship()">Cancelar</button>
               <button class="btn btn--danger" style="flex:1" onclick="App.confirmEndChampionship()">Encerrar</button>
@@ -209,7 +209,7 @@ function _renderStandings(c) {
 
   return `
     <div class="champ-standings">
-      <div class="section-title" style="margin-bottom:8px"><span>Classificacao</span></div>
+      <div class="section-title" style="margin-bottom:8px"><span>Classificação</span></div>
       <div class="card" style="padding:0;overflow:hidden;margin-bottom:16px">
         <table class="standings-table">
           <thead>

@@ -136,8 +136,6 @@ function _renderChampionshipHistory(history) {
 function _renderDrawHistory(drawHistory) {
   if (!drawHistory.length) return '';
 
-  const { teamAvg } = window.__rachaHelpers || {};
-
   const items = drawHistory.slice(0, 5).map((entry, i) => {
     const date  = new Date(entry.date).toLocaleDateString('pt-BR') +
                   ' às ' + new Date(entry.date).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
