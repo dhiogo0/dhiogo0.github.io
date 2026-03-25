@@ -37,6 +37,7 @@ export const store = {
   swapSelected:    null,
   history:             [],
   starHover:           0,
+  readOnly:            false,
   renamingTeamId:      null,
   drawHistory:         loadHistory(),
   currentUser:         null,
@@ -173,6 +174,7 @@ export function draw(onDone) {
     store.history        = [];
     store.swapMode       = false;
     store.swapSelected   = null;
+    store.readOnly       = false;
     store.step           = 3;
     _drawing           = false;
     _pushDrawHistory();
@@ -268,6 +270,7 @@ export function loadDraw(id) {
   store.swapSelected = null;
   store.history      = [];
   store.renamingTeamId = null;
+  store.readOnly     = true;
   store.step         = 3;
 }
 

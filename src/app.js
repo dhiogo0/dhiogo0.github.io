@@ -340,6 +340,7 @@ window.App = {
     store.teams    = [];
     store.reserves = [];
     store.history  = [];
+    store.readOnly = false;
     setStep(0);
     render();
   },

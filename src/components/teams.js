@@ -3,20 +3,21 @@ import { teamAvg, balanceScore, balanceInfo } from '../logic/balance.js';
 import { posIcon, posLabel, starsDisplay, escHtml } from '../utils/helpers.js';
 
 export function renderTeams() {
-  const { teams, reserves, gks, gkAssignments, swapMode, swapSelected, history, championshipModal, championshipFormat, championship } = store;
+  const { teams, reserves, gks, gkAssignments, swapMode, swapSelected, history, championshipModal, championshipFormat, championship, readOnly } = store;
   const score = balanceScore(teams);
   const bi    = balanceInfo(score);
 
   return `
     <div class="fade-up">
 
+      ${readOnly ? '<div class="swap-hint">📋 Visualização do histórico (somente leitura)</div>' : ''}
       ${_renderBalanceBar(bi)}
-      ${_renderActions(swapMode, history)}
-      ${swapMode ? _renderSwapHint(swapSelected) : ''}
-      ${teams.map((t, i) => _renderTeamCard(t, i, swapMode, swapSelected)).join('')}
-      ${reserves.length ? _renderReserves(reserves, swapMode, swapSelected) : ''}
-      ${gks.length ? _renderGkSection(gks, teams, gkAssignments) : ''}
-      ${_renderChampionshipCTA(teams, championship)}
+      ${readOnly ? '' : _renderActions(swapMode, history)}
+      ${!readOnly && swapMode ? _renderSwapHint(swapSelected) : ''}
+      ${teams.map((t, i) => _renderTeamCard(t, i, readOnly ? false : swapMode, swapSelected, readOnly)).join('')}
+      ${reserves.length ? _renderReserves(reserves, readOnly ? false : swapMode, swapSelected) : ''}
+      ${gks.length ? _renderGkSection(gks, teams, gkAssignments, readOnly) : ''}
+      ${readOnly ? _renderReadOnlyActions() : _renderChampionshipCTA(teams, championship)}
 
     </div>
     ${championshipModal ? _renderChampionshipModal(teams, championshipFormat) : ''}
@@ -72,11 +73,25 @@ function _renderSwapHint(selected) {
   return `<div class="swap-hint">${msg}</div>`;
 }
 
-function _renderTeamCard(team, idx, swapMode, swapSelected) {
+function _renderReadOnlyActions() {
+  return `
+    <div class="actions-row">
+      <button
+        class="btn btn--ghost btn--sm btn--whatsapp"
+        data-tooltip="Compartilhar no WhatsApp"
+        onclick="App.exportWhatsapp()">
+        📤 Zap
+      </button>
+      <button class="btn btn--ghost btn--sm" data-tooltip="Voltar ao histórico" onclick="App.goTo('history')">↩️ Voltar</button>
+    </div>
+  `;
+}
+
+function _renderTeamCard(team, idx, swapMode, swapSelected, readOnly = false) {
   const avg      = teamAvg(team).toFixed(1);
   const renaming = store.renamingTeamId === team.id;
 
-  const nameEl = renaming
+  const nameEl = renaming && !readOnly
     ? `<input
         class="team-name-input"
         id="team-name-${team.id}"
@@ -86,9 +101,8 @@ function _renderTeamCard(team, idx, swapMode, swapSelected) {
         onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}if(event.key==='Escape')App.cancelRenameTeam();"
       />`
     : `<span
-        class="team-card__name team-card__name--editable"
-        onclick="App.startRenameTeam(${team.id})"
-        data-tooltip="Clique para renomear">
+        class="team-card__name${readOnly ? '' : ' team-card__name--editable'}"
+        ${readOnly ? '' : `onclick="App.startRenameTeam(${team.id})" data-tooltip="Clique para renomear"`}>
         ${escHtml(team.name.toUpperCase())}
       </span>`;
 
