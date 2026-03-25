@@ -19,24 +19,28 @@ function _fmt(secs) {
   return `${m}:${s}`;
 }
 
-function _playAlarm() {
+async function _playAlarm() {
   try {
-    const ctx  = new (window.AudioContext || window.webkitAudioContext)();
-    const beep = (startAt, freq = 880) => {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (ctx.state === 'suspended') await ctx.resume();
+    const beep = (startAt, freq = 880, dur = 0.5) => {
       const osc  = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.connect(gain);
       gain.connect(ctx.destination);
-      osc.type = 'sine';
+      osc.type = 'square';
       osc.frequency.value = freq;
-      gain.gain.setValueAtTime(0.7, startAt);
-      gain.gain.exponentialRampToValueAtTime(0.001, startAt + 0.45);
+      gain.gain.setValueAtTime(0.6, startAt);
+      gain.gain.exponentialRampToValueAtTime(0.001, startAt + dur);
       osc.start(startAt);
-      osc.stop(startAt + 0.45);
+      osc.stop(startAt + dur);
     };
-    beep(ctx.currentTime);
-    beep(ctx.currentTime + 0.55);
-    beep(ctx.currentTime + 1.10);
+    const t = ctx.currentTime;
+    beep(t,        880, 0.4);
+    beep(t + 0.5,  880, 0.4);
+    beep(t + 1.0,  988, 0.4);
+    beep(t + 1.5,  988, 0.4);
+    beep(t + 2.0, 1047, 0.8);
   } catch (_) {}
 }
 
@@ -153,7 +157,7 @@ export function renderTimer() {
   }).join('');
 
   const ctrlBtn = _finished
-    ? `<div class="timer-finished-msg">Fim de Jogo!</div>`
+    ? `<button class="btn btn--sm timer-btn-main timer-btn-finished" onclick="App.timerReset()">Fim de Jogo! — Resetar</button>`
     : _running
       ? `<button class="btn btn--ghost btn--sm timer-btn-main" onclick="App.timerPause()">Pausar</button>`
       : `<button class="btn btn--primary btn--sm timer-btn-main" onclick="App.timerStart()">Iniciar</button>`;
