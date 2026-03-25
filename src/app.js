@@ -34,6 +34,11 @@ import {
   cancelEndChampionship as cancelEndChampionshipAction,
   confirmEndChampionship as confirmEndChampionshipAction,
   undoSequentialResult,
+  exportPlayersFile,
+  parsePlayersText,
+  openImportModal,
+  closeImportModal,
+  confirmImport,
 } from './state/store.js';
 
 import { savePlayers, saveHistory, saveProfile } from './utils/storage.js';
@@ -41,7 +46,7 @@ import { renderStarsWidget } from './utils/helpers.js';
 import { showToast }         from './utils/toast.js';
 import { renderHeader }      from './components/header.js';
 import { renderBottomNav }   from './components/bottomnav.js';
-import { renderAddPlayer, renderPlayersList } from './components/players.js';
+import { renderAddPlayer, renderPlayersList, renderImportModal } from './components/players.js';
 import { renderConfig }      from './components/config.js';
 import { renderDrawing }     from './components/drawing.js';
 import { renderTeams }       from './components/teams.js';
@@ -84,7 +89,8 @@ function render() {
   root.innerHTML =
     renderHeader() +
     `<main class="screen">${content}</main>` +
-    (isAnimating ? '' : renderBottomNav());
+    (isAnimating ? '' : renderBottomNav()) +
+    (store.importModal ? renderImportModal() : '');
 
   /* Auto-focus player name input when editing modal is open */
   if (step === 6 && store.editModal) {
@@ -319,6 +325,36 @@ window.App = {
 
   confirmEndChampionship() {
     confirmEndChampionshipAction();
+    render();
+  },
+
+  exportPlayersFile() {
+    exportPlayersFile();
+  },
+
+  importFile(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const players = parsePlayersText(e.target.result);
+        if (players.length) { openImportModal(players); render(); }
+        else showToast('Arquivo sem jogadores válidos.', 'error');
+      } catch {
+        showToast('Arquivo inválido.', 'error');
+      }
+    };
+    reader.readAsText(file);
+  },
+
+  confirmImport(mode) {
+    confirmImport(mode);
+    render();
+    _syncToCloud();
+  },
+
+  closeImportModal() {
+    closeImportModal();
     render();
   },
 

@@ -23,6 +23,8 @@ export const store = {
   editId:          null,
   editModal:       false,
   confirmDeleteId: null,
+  importModal:      false,
+  importCandidates: [],
   playersPerTeam:  _savedProfile.defaultPlayersPerTeam || 5,
   teams:           [],
   reserves:        [],
@@ -348,6 +350,64 @@ function _archiveChampionship() {
   if (!c) return;
   store.championshipHistory = [c, ...store.championshipHistory].slice(0, 20);
   saveChampionshipHistory(store.championshipHistory);
+}
+
+/* ── Import / Export ── */
+export async function exportPlayersFile() {
+  if (!store.players.length) {
+    showToast('Nenhum jogador para exportar.', 'error');
+    return;
+  }
+  const lines = store.players.map(p => `${p.name}|${p.position}|${p.level}`).join('\n');
+  const file  = new File([lines], 'racha-facil.txt', { type: 'text/plain' });
+
+  if (navigator.canShare?.({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file], title: 'Lista de Jogadores — Racha Fácil' });
+    } catch (e) {
+      if (e.name !== 'AbortError') showToast('Erro ao compartilhar.', 'error');
+    }
+  } else {
+    const url = URL.createObjectURL(file);
+    const a   = Object.assign(document.createElement('a'), { href: url, download: 'racha-facil.txt' });
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+}
+
+export function parsePlayersText(text) {
+  return text.trim().split('\n').filter(Boolean).map(line => {
+    const [name, position, level] = line.split('|');
+    return { name: name?.trim(), position: position?.trim() || 'MID', level: parseInt(level) || 3 };
+  }).filter(p => p.name);
+}
+
+export function openImportModal(players) {
+  store.importCandidates = players;
+  store.importModal      = true;
+}
+
+export function closeImportModal() {
+  store.importModal      = false;
+  store.importCandidates = [];
+}
+
+export function confirmImport(mode) {
+  const base = Date.now();
+  const newPlayers = store.importCandidates.map((p, i) => ({
+    id:       base + i,
+    name:     p.name,
+    position: p.position || 'MID',
+    level:    p.level    || 3,
+    present:  true,
+  }));
+  store.players = mode === 'replace'
+    ? newPlayers
+    : [...store.players, ...newPlayers];
+  savePlayers(store.players);
+  store.importModal      = false;
+  store.importCandidates = [];
+  showToast(`${newPlayers.length} jogadores importados!`);
 }
 
 /* ── Internals ── */

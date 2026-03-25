@@ -131,9 +131,21 @@ export function renderPlayersList() {
 
   return `
     <div class="fade-up">
-      <div class="section-title">
+      <div class="section-title" style="display:flex;align-items:center;gap:8px">
         <span>Jogadores</span>
         <span class="badge">${players.length}</span>
+        <span style="margin-left:auto;display:flex;gap:6px">
+          <button class="btn btn--ghost btn--sm" onclick="document.getElementById('importFileInput').click()">
+            📥 Importar
+          </button>
+          ${players.length > 0 ? `
+            <button class="btn btn--ghost btn--sm" onclick="App.exportPlayersFile()">
+              📤 Exportar
+            </button>
+          ` : ''}
+        </span>
+        <input id="importFileInput" type="file" accept=".txt" style="display:none"
+          onchange="App.importFile(this.files[0]);this.value=''">
       </div>
 
       ${players.length > 0 ? `
@@ -151,5 +163,35 @@ export function renderPlayersList() {
     </div>
     ${confirmModal}
     ${modal}
+  `;
+}
+
+export function renderImportModal() {
+  const { importCandidates } = store;
+  const preview = importCandidates.slice(0, 5).map(p => escHtml(p.name)).join(', ');
+  const extra   = importCandidates.length > 5 ? ` e mais ${importCandidates.length - 5}...` : '';
+
+  return `
+    <div class="modal-backdrop" onclick="App.closeImportModal()">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal__header">
+          <p class="card__headline" style="margin-bottom:0">📥 IMPORTAR JOGADORES</p>
+          <button class="icon-btn" aria-label="Fechar" onclick="App.closeImportModal()">✕</button>
+        </div>
+        <p class="modal__body">
+          <strong>${importCandidates.length} jogadores</strong> recebidos:<br>
+          <span style="opacity:.7;font-size:.9em">${preview}${extra}</span>
+        </p>
+        <div class="btn-row" style="margin-top:18px;flex-direction:column;gap:8px">
+          <button class="btn btn--primary" onclick="App.confirmImport('replace')">
+            Substituir minha lista
+          </button>
+          <button class="btn btn--ghost" onclick="App.confirmImport('merge')">
+            Adicionar à lista atual
+          </button>
+          <button class="btn btn--ghost btn--sm" onclick="App.closeImportModal()">Cancelar</button>
+        </div>
+      </div>
+    </div>
   `;
 }
