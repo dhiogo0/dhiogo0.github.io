@@ -3,7 +3,7 @@ import { teamAvg, balanceScore, balanceInfo } from '../logic/balance.js';
 import { posIcon, posLabel, starsDisplay, escHtml } from '../utils/helpers.js';
 
 export function renderTeams() {
-  const { teams, reserves, swapMode, swapSelected, history, championshipModal, championshipFormat, championship } = store;
+  const { teams, reserves, gks, gkAssignments, swapMode, swapSelected, history, championshipModal, championshipFormat, championship } = store;
   const score = balanceScore(teams);
   const bi    = balanceInfo(score);
 
@@ -15,6 +15,7 @@ export function renderTeams() {
       ${swapMode ? _renderSwapHint(swapSelected) : ''}
       ${teams.map((t, i) => _renderTeamCard(t, i, swapMode, swapSelected)).join('')}
       ${reserves.length ? _renderReserves(reserves, swapMode, swapSelected) : ''}
+      ${gks.length ? _renderGkSection(gks, teams, gkAssignments) : ''}
       ${_renderChampionshipCTA(teams, championship)}
 
     </div>
@@ -178,6 +179,55 @@ function _renderChampionshipModal(teams, selectedFormat) {
           <button class="btn btn--primary" style="flex:2" onclick="App.confirmChampionship()">Criar →</button>
         </div>
       </div>
+    </div>
+  `;
+}
+
+function _renderGkSection(gks, teams, gkAssignments) {
+  const isTeamMode = gks.length === teams.length && gks.length > 0;
+  const isRotation = !isTeamMode && gks.length === 3;
+  const title = isRotation ? '🧤 GOLEIROS — RODÍZIO' : '🧤 GOLEIROS';
+
+  const rows = gkAssignments.map((gkId, idx) => {
+    const gk = gks.find(g => g.id === gkId);
+    if (!gk) return '';
+
+    let assignLabel, assignColor;
+    if (isTeamMode) {
+      const team = teams[idx];
+      assignLabel = team ? escHtml(team.name) : '—';
+      assignColor = team?.color || '#aaa';
+    } else if (isRotation) {
+      if      (idx === 0) { assignLabel = 'Em quadra · Lado A'; assignColor = 'var(--green)'; }
+      else if (idx === 1) { assignLabel = 'Em quadra · Lado B'; assignColor = '#00c8e8'; }
+      else                { assignLabel = 'Aguardando';          assignColor = 'var(--dimmed)'; }
+    } else {
+      if      (idx === 0) { assignLabel = 'Lado A'; assignColor = 'var(--green)'; }
+      else if (idx === 1) { assignLabel = 'Lado B'; assignColor = '#00c8e8'; }
+      else                { assignLabel = 'Aguardando'; assignColor = 'var(--dimmed)'; }
+    }
+
+    return `
+      <div class="gk-row">
+        <span class="gk-row__icon">🧤</span>
+        <span class="gk-row__name">${escHtml(gk.name)}</span>
+        <span class="gk-row__assign" style="color:${assignColor}">${assignLabel}</span>
+        <div class="gk-row__controls">
+          <button class="gk-ctrl-btn" onclick="App.moveGk(${gkId}, -1)"
+            ${idx === 0 ? 'disabled' : ''}>↑</button>
+          <button class="gk-ctrl-btn" onclick="App.moveGk(${gkId}, 1)"
+            ${idx === gkAssignments.length - 1 ? 'disabled' : ''}>↓</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <div class="gk-section">
+      <div class="gk-section__header">
+        <span class="gk-section__title">${title}</span>
+      </div>
+      ${rows}
     </div>
   `;
 }

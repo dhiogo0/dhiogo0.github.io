@@ -1,42 +1,15 @@
 import { TEAM_NAMES, TEAM_COLORS } from '../data/constants.js';
 
 /**
- * Position-aware Snake Draft:
- *
- * >= 5v5 (GK priority ON):
- *   - Up to 1 GK per team is guaranteed a spot regardless of level
- *   - GKs are drafted first (1 per team), then outfield by level
- *
- * < 5v5 (GK priority OFF):
- *   - Outfield players fill team slots first; GKs only get remaining spots
- *   - GKs are drafted last, after all outfield players
+ * Snake Draft — recebe apenas jogadores de linha (GKs são separados antes).
+ * Ordena por nível e distribui em snake, garantindo exatamente
+ * playersPerTeam jogadores por time.
  */
 export function snakeDraft(players, playersPerTeam) {
-  const nTeams     = Math.floor(players.length / playersPerTeam);
-  const totalSlots = nTeams * playersPerTeam;
-  const gkPriority = playersPerTeam >= 5;
-
-  const gks      = [...players].filter(p => p.position === 'GK').sort((a, b) => b.level - a.level);
-  const outfield = [...players].filter(p => p.position !== 'GK').sort((a, b) => b.level - a.level);
-
-  let draftPool, reserves;
-
-  if (gkPriority) {
-    // GKs vão na frente do pool (até 1 por time); restante ordenado por nível
-    const gksInPlay = gks.slice(0, Math.min(gks.length, nTeams));
-    const rest      = [...gks.slice(gksInPlay.length), ...outfield].sort((a, b) => b.level - a.level);
-    draftPool = [...gksInPlay, ...rest.slice(0, totalSlots - gksInPlay.length)];
-    reserves  = rest.slice(totalSlots - gksInPlay.length);
-  } else {
-    // Linha preenche primeiro; goleiros ficam com o que sobra
-    const ofInPlay  = outfield.slice(0, Math.min(outfield.length, totalSlots));
-    const gksInPlay = gks.slice(0, totalSlots - ofInPlay.length);
-    draftPool = [...ofInPlay, ...gksInPlay];
-    reserves  = [
-      ...outfield.slice(ofInPlay.length),
-      ...gks.slice(gksInPlay.length),
-    ].sort((a, b) => b.level - a.level);
-  }
+  const sorted   = [...players].sort((a, b) => b.level - a.level);
+  const nTeams   = Math.floor(sorted.length / playersPerTeam);
+  const inPlay   = sorted.slice(0, nTeams * playersPerTeam);
+  const reserves = sorted.slice(nTeams * playersPerTeam);
 
   const teams = Array.from({ length: nTeams }, (_, i) => ({
     id:      i,
@@ -45,9 +18,7 @@ export function snakeDraft(players, playersPerTeam) {
     players: [],
   }));
 
-  // Um único passe de snake garante exatamente playersPerTeam por time
-  _snakeInto(teams, draftPool);
-
+  _snakeInto(teams, inPlay);
   return { teams, reserves };
 }
 

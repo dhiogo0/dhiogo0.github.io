@@ -837,6 +837,45 @@ html, body {
   color: var(--dimmed); letter-spacing: 0.3px;
 }
 
+/* ── GK section ── */
+.gk-section {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.gk-section__header {
+  padding: 10px 16px 8px;
+  border-bottom: 1px solid var(--border2);
+}
+.gk-section__title {
+  font-size: 11px; font-weight: 700; letter-spacing: 1px;
+  color: var(--dimmed); text-transform: uppercase;
+}
+.gk-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border2);
+}
+.gk-row:last-child { border-bottom: none; }
+.gk-row__icon  { font-size: 16px; flex-shrink: 0; }
+.gk-row__name  { font-size: 14px; font-weight: 600; flex: 1; }
+.gk-row__assign {
+  font-size: 12px; font-weight: 600;
+  letter-spacing: 0.3px; flex-shrink: 0;
+}
+.gk-row__controls { display: flex; gap: 4px; flex-shrink: 0; }
+.gk-ctrl-btn {
+  width: 28px; height: 28px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border2);
+  border-radius: 7px; color: #fff;
+  font-size: 13px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.gk-ctrl-btn:disabled { opacity: 0.25; cursor: default; }
+
 /* ── Championship CTA (on teams screen) ── */
 .champ-cta { margin-top: 20px; text-align: center; }
 .champ-cta__divider {

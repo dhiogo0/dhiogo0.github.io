@@ -17,6 +17,7 @@ import {
   startRenameTeam,
   commitRenameTeam,
   cancelRenameTeam,
+  moveGk,
   loadDraw,
   updateProfile,
   togglePresence,
@@ -324,6 +325,11 @@ window.App = {
 
   cancelPenalties() {
     clearPenaltyMatch();
+    render();
+  },
+
+  moveGk(gkId, direction) {
+    moveGk(gkId, direction);
     render();
   },
 

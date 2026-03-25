@@ -28,6 +28,8 @@ export const store = {
   playersPerTeam:  _savedProfile.defaultPlayersPerTeam || 5,
   teams:           [],
   reserves:        [],
+  gks:             [],
+  gkAssignments:   [],
   swapMode:        false,
   swapSelected:    null,
   history:             [],
@@ -55,12 +57,20 @@ export function presentPlayers() {
   return store.players.filter(p => p.present !== false);
 }
 
+export function presentOutfield() {
+  return store.players.filter(p => p.present !== false && p.position !== 'GK');
+}
+
+export function presentGks() {
+  return store.players.filter(p => p.present !== false && p.position === 'GK');
+}
+
 export function numTeams() {
-  return Math.floor(presentPlayers().length / store.playersPerTeam);
+  return Math.floor(presentOutfield().length / store.playersPerTeam);
 }
 
 export function reserveCount() {
-  return presentPlayers().length - numTeams() * store.playersPerTeam;
+  return presentOutfield().length - numTeams() * store.playersPerTeam;
 }
 
 export function togglePresence(id) {
@@ -150,14 +160,17 @@ export function draw(onDone) {
   _drawing = true;
   store.step = 2;
   setTimeout(() => {
-    const shuffled = [...presentPlayers()].sort(() => Math.random() - 0.5);
-    const result   = snakeDraft(shuffled, store.playersPerTeam);
-    store.teams        = result.teams;
-    store.reserves     = result.reserves;
-    store.history      = [];
-    store.swapMode     = false;
-    store.swapSelected = null;
-    store.step         = 3;
+    const gkPlayers = presentGks();
+    const shuffled  = [...presentOutfield()].sort(() => Math.random() - 0.5);
+    const result    = snakeDraft(shuffled, store.playersPerTeam);
+    store.teams          = result.teams;
+    store.reserves       = result.reserves;
+    store.gks            = gkPlayers;
+    store.gkAssignments  = gkPlayers.map(gk => gk.id);
+    store.history        = [];
+    store.swapMode       = false;
+    store.swapSelected   = null;
+    store.step           = 3;
     _drawing           = false;
     _pushDrawHistory();
     onDone();
@@ -231,12 +244,24 @@ export function cancelRenameTeam() {
   store.renamingTeamId = null;
 }
 
+export function moveGk(gkId, direction) {
+  const idx = store.gkAssignments.indexOf(gkId);
+  if (idx === -1) return;
+  const newIdx = idx + direction;
+  if (newIdx < 0 || newIdx >= store.gkAssignments.length) return;
+  const arr = [...store.gkAssignments];
+  [arr[idx], arr[newIdx]] = [arr[newIdx], arr[idx]];
+  store.gkAssignments = arr;
+}
+
 export function loadDraw(id) {
   const entry = store.drawHistory.find(e => e.id === id);
   if (!entry) return;
-  store.teams        = JSON.parse(JSON.stringify(entry.teams));
-  store.reserves     = JSON.parse(JSON.stringify(entry.reserves));
-  store.swapMode     = false;
+  store.teams          = JSON.parse(JSON.stringify(entry.teams));
+  store.reserves       = JSON.parse(JSON.stringify(entry.reserves));
+  store.gks            = JSON.parse(JSON.stringify(entry.gks || []));
+  store.gkAssignments  = [...(entry.gkAssignments || [])];
+  store.swapMode       = false;
   store.swapSelected = null;
   store.history      = [];
   store.renamingTeamId = null;
@@ -259,6 +284,20 @@ export function exportWhatsapp() {
   if (store.reserves.length) {
     txt += '*🔄 Reservas*\n';
     store.reserves.forEach(p => { txt += `${_emojiForPos(p.position)} ${p.name}\n`; });
+  }
+  if (store.gks.length) {
+    txt += '\n*🧤 Goleiros*\n';
+    const isTeamMode = store.gks.length === store.teams.length;
+    const isRotation = !isTeamMode && store.gks.length === 3;
+    store.gkAssignments.forEach((gkId, idx) => {
+      const gk = store.gks.find(g => g.id === gkId);
+      if (!gk) return;
+      let assign;
+      if (isTeamMode)        assign = store.teams[idx]?.name || '—';
+      else if (isRotation)   assign = idx < 2 ? `Em quadra (Lado ${idx === 0 ? 'A' : 'B'})` : 'Aguardando';
+      else                   assign = idx === 0 ? 'Lado A' : idx === 1 ? 'Lado B' : 'Aguardando';
+      txt += `🧤 ${gk.name} — ${assign}\n`;
+    });
   }
   window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(txt), '_blank');
 }
@@ -477,6 +516,8 @@ function _pushDrawHistory() {
     playersPerTeam: store.playersPerTeam,
     teams:          JSON.parse(JSON.stringify(store.teams)),
     reserves:       JSON.parse(JSON.stringify(store.reserves)),
+    gks:            JSON.parse(JSON.stringify(store.gks)),
+    gkAssignments:  [...store.gkAssignments],
   };
   store.drawHistory = [entry, ...store.drawHistory].slice(0, 20);
   saveHistory(store.drawHistory);
