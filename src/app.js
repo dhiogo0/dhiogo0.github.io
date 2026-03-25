@@ -54,7 +54,7 @@ import { renderChampionship } from './components/championship.js';
 import { timerStart, timerPause, timerReset, timerSetDuration } from './components/timer.js';
 import { renderProfile }     from './components/profile.js';
 
-import { signInWithGoogle, signOutUser, onAuthChange } from './firebase/auth.js';
+import { signInWithGoogle, signOutUser, onAuthChange, handleRedirectResult } from './firebase/auth.js';
 import { loadUserData, saveUserData }                  from './firebase/db.js';
 
 /* ── Root element ── */
@@ -416,4 +416,5 @@ onAuthChange(async (user) => {
 });
 
 /* ── Boot ── */
+handleRedirectResult().catch(() => {});
 render();
