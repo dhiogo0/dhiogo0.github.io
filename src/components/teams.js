@@ -58,7 +58,7 @@ function _renderActions(swapMode, history) {
         onclick="App.exportWhatsapp()">
         📤 Zap
       </button>
-      <button class="btn btn--ghost btn--sm" data-tooltip="Fazer novo sorteio" onclick="App.draw()">🔁</button>
+      <button class="btn btn--ghost btn--sm" data-tooltip="Fazer novo sorteio" onclick="App.setStep(1)">🔁</button>
     </div>
   `;
 }
