@@ -62,7 +62,7 @@ function _renderEntry(entry, idx) {
 }
 
 export function renderHistoryView() {
-  const { teams, reserves, gks, gkAssignments } = store;
+  const { teams, reserves, gks = [], gkAssignments = [] } = store.historyEntry || {};
 
   const teamCards = teams.map((t, i) => {
     const avg = teamAvg(t).toFixed(1);

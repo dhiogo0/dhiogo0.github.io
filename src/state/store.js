@@ -40,6 +40,7 @@ export const store = {
   renamingTeamId:      null,
   drawHistory:         loadHistory(),
   currentUser:         null,
+  historyEntry:          null,
   championship:          _savedChampionship,
   championshipHistory:   loadChampionshipHistory(),
   championshipModal:     false,
@@ -93,6 +94,7 @@ export function setStep(n) {
   store.swapMode       = false;
   store.swapSelected   = null;
   store.renamingTeamId = null;
+  if (n !== 8) store.historyEntry = null;
 }
 
 export function setFormField(key, value) {
@@ -261,15 +263,8 @@ export function moveGk(gkId, direction) {
 export function loadDraw(id) {
   const entry = store.drawHistory.find(e => e.id === id);
   if (!entry) return;
-  store.teams          = JSON.parse(JSON.stringify(entry.teams));
-  store.reserves       = JSON.parse(JSON.stringify(entry.reserves));
-  store.gks            = JSON.parse(JSON.stringify(entry.gks || []));
-  store.gkAssignments  = [...(entry.gkAssignments || [])];
-  store.swapMode       = false;
-  store.swapSelected   = null;
-  store.history        = [];
-  store.renamingTeamId = null;
-  store.step           = 8;
+  store.historyEntry = JSON.parse(JSON.stringify(entry));
+  store.step         = 8;
 }
 
 export function exportWhatsapp() {
