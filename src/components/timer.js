@@ -5,6 +5,7 @@ let _running    = false;
 let _intervalId = null;
 let _finished   = false;
 let _startedAt  = null; // timestamp real para corrigir throttle de background
+let _audioCtx   = null; // contexto criado no gesto do usuário para desbloquear no iOS
 
 const PRESETS = [
   { label: '5m',  val: 5  * 60 },
@@ -19,9 +20,18 @@ function _fmt(secs) {
   return `${m}:${s}`;
 }
 
+function _unlockAudio() {
+  try {
+    if (!_audioCtx) {
+      _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (_audioCtx.state === 'suspended') _audioCtx.resume();
+  } catch (_) {}
+}
+
 async function _playAlarm() {
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const ctx = _audioCtx || new (window.AudioContext || window.webkitAudioContext)();
     if (ctx.state === 'suspended') await ctx.resume();
     const beep = (startAt, freq = 880, dur = 0.5) => {
       const osc  = ctx.createOscillator();
@@ -95,6 +105,7 @@ export function isTimerRunning() { return _running; }
 
 export function timerStart() {
   if (_running || _finished) return;
+  _unlockAudio();
   _requestNotificationPermission();
   // Calcula o startedAt considerando tempo ja decorrido (retomada apos pause)
   _startedAt  = Date.now() - (_duration - _timeLeft) * 1000;
