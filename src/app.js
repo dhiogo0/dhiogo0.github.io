@@ -22,6 +22,7 @@ import {
   updateProfile,
   togglePresence,
   toggleAllPresence,
+  toggleSeed,
   openChampionshipModal,
   closeChampionshipModal,
   setChampionshipFormat,
@@ -212,6 +213,11 @@ window.App = {
   toggleAllPresence() {
     toggleAllPresence();
     savePlayers(store.players);
+    render();
+  },
+
+  toggleSeed(id) {
+    toggleSeed(id);
     render();
   },
 

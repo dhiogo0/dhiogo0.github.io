@@ -660,6 +660,12 @@ html, body {
 .player-row--absent { opacity: 0.45; }
 .player-row--absent .player-row__name { text-decoration: line-through; }
 
+.player-row--seed { border-left: 3px solid #fbbf24; }
+
+.seed-btn { opacity: 0.35; transition: opacity 0.15s, color 0.15s; }
+.seed-btn:hover { opacity: 0.7; }
+.seed-btn--on { opacity: 1; color: #fbbf24; }
+
 /* ── Modal ── */
 @keyframes slideUp {
   from { transform: translateY(100%); opacity: 0; }

@@ -97,7 +97,7 @@ export function renderPlayersList() {
     : players.map((p, i) => {
         const absent = p.present === false;
         return `
-        <div class="player-row ${absent ? 'player-row--absent' : ''}" style="animation-delay:${i * 0.04}s" data-id="${p.id}">
+        <div class="player-row ${absent ? 'player-row--absent' : ''} ${p.seed ? 'player-row--seed' : ''}" style="animation-delay:${i * 0.04}s" data-id="${p.id}">
           <button class="presence-btn ${absent ? '' : 'presence-btn--on'}"
             aria-label="${absent ? 'Marcar presente' : 'Marcar ausente'}"
             data-tooltip="${absent ? 'Marcar presente' : 'Marcar ausente'}"
@@ -110,6 +110,10 @@ export function renderPlayersList() {
             <span class="player-row__pos">${posLabel(p.position)}</span>
           </div>
           ${starsDisplay(p.level)}
+          <button class="icon-btn seed-btn ${p.seed ? 'seed-btn--on' : ''}"
+            aria-label="${p.seed ? 'Remover cabeça de chave' : 'Marcar como cabeça de chave'}"
+            data-tooltip="${p.seed ? 'Cabeça de chave' : 'Marcar como cabeça de chave'}"
+            onclick="App.toggleSeed(${p.id})">👑</button>
           <button class="icon-btn" aria-label="Editar ${escHtml(p.name)}"
             data-tooltip="Editar"
             onclick="App.editPlayer(${p.id})">✏️</button>

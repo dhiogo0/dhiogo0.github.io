@@ -2,14 +2,12 @@ import { TEAM_NAMES, TEAM_COLORS } from '../data/constants.js';
 
 /**
  * Snake Draft — recebe apenas jogadores de linha (GKs são separados antes).
+ * Jogadores marcados como seed são distribuídos um por time antes do draft.
  * Ordena por nível e distribui em snake, garantindo exatamente
  * playersPerTeam jogadores por time.
  */
 export function snakeDraft(players, playersPerTeam) {
-  const sorted   = [...players].sort((a, b) => b.level - a.level);
-  const nTeams   = Math.floor(sorted.length / playersPerTeam);
-  const inPlay   = sorted.slice(0, nTeams * playersPerTeam);
-  const reserves = sorted.slice(nTeams * playersPerTeam);
+  const nTeams = Math.floor(players.length / playersPerTeam);
 
   const teams = Array.from({ length: nTeams }, (_, i) => ({
     id:      i,
@@ -17,6 +15,24 @@ export function snakeDraft(players, playersPerTeam) {
     color:   TEAM_COLORS[i] || '#00e87a',
     players: [],
   }));
+
+  // Separa seeds dos demais
+  const seeds   = [...players].filter(p => p.seed);
+  const regular = [...players].filter(p => !p.seed);
+
+  // Seeds que cabem (1 por time) são ancoradas; excedentes entram no pool regular
+  const anchoredSeeds = seeds.slice(0, nTeams);
+  const extraSeeds    = seeds.slice(nTeams);
+
+  // Embaralha seeds ancoradas e distribui uma por time
+  anchoredSeeds.sort(() => Math.random() - 0.5);
+  anchoredSeeds.forEach((seed, i) => teams[i].players.push(seed));
+
+  // Pool restante: regular + seeds excedentes, ordenado por nível
+  const pool   = [...regular, ...extraSeeds].sort((a, b) => b.level - a.level);
+  const slots  = nTeams * playersPerTeam - anchoredSeeds.length;
+  const inPlay = pool.slice(0, slots);
+  const reserves = pool.slice(slots);
 
   _snakeInto(teams, inPlay);
   return { teams, reserves };

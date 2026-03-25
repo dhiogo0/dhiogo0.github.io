@@ -84,6 +84,13 @@ export function togglePresence(id) {
   );
 }
 
+export function toggleSeed(id) {
+  store.players = store.players.map(p =>
+    p.id === id ? { ...p, seed: !p.seed } : p
+  );
+  savePlayers(store.players);
+}
+
 export function toggleAllPresence() {
   const allPresent = store.players.every(p => p.present !== false);
   store.players = store.players.map(p => ({ ...p, present: !allPresent }));
@@ -167,8 +174,8 @@ export function draw(onDone) {
   store.step = 2;
   setTimeout(() => {
     const gkPlayers = presentGks();
-    const shuffled  = [...presentOutfield()].sort(() => Math.random() - 0.5);
-    const result    = snakeDraft(shuffled, store.playersPerTeam);
+    const outfield  = [...presentOutfield()].sort(() => Math.random() - 0.5);
+    const result    = snakeDraft(outfield, store.playersPerTeam);
     store.teams          = result.teams;
     store.reserves       = result.reserves;
     store.gks            = gkPlayers;
