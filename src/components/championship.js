@@ -55,6 +55,8 @@ function _renderFinished(c) {
 function _renderOngoing(c) {
   if (c.format === 'round-robin') return _renderSequential(c);
 
+  const { confirmEndChampionship } = store;
+
   return `
     <div class="fade-up">
       ${renderTimer()}
@@ -64,6 +66,19 @@ function _renderOngoing(c) {
       </div>
       ${c.format === 'groups+knockout' ? _renderStandings(c) : ''}
       ${_renderMatchList(c, false, isTimerRunning())}
+      <div style="margin-top:16px">
+        ${confirmEndChampionship ? `
+          <div class="confirm-end">
+            <p class="confirm-end__text">Encerrar e definir o campeão?</p>
+            <div class="btn-row">
+              <button class="btn btn--ghost" style="flex:1" onclick="App.cancelEndChampionship()">Cancelar</button>
+              <button class="btn btn--danger" style="flex:1" onclick="App.confirmEndChampionship()">Encerrar</button>
+            </div>
+          </div>
+        ` : `
+          <button class="btn btn--ghost" onclick="App.endChampionship()">Encerrar Campeonato</button>
+        `}
+      </div>
     </div>
   `;
 }

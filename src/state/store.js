@@ -423,9 +423,17 @@ export function cancelEndChampionship() {
 
 export function confirmEndChampionship() {
   if (!store.championship) return;
-  finishSequentialChampionship(store.championship);
+  const c = store.championship;
+  if (c.format === 'round-robin') {
+    finishSequentialChampionship(c);
+  } else {
+    c.status     = 'finished';
+    c.finishedAt = new Date().toISOString();
+    const fin = c.matches.find(m => m.phase === 'final' && m.status === 'done');
+    c.championId = fin?.winnerId ?? null;
+  }
   store.confirmEndChampionship = false;
-  saveChampionship(store.championship);
+  saveChampionship(c);
   _archiveChampionship();
 }
 
