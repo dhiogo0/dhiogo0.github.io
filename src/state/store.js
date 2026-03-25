@@ -37,7 +37,6 @@ export const store = {
   swapSelected:    null,
   history:             [],
   starHover:           0,
-  readOnly:            false,
   renamingTeamId:      null,
   drawHistory:         loadHistory(),
   currentUser:         null,
@@ -94,7 +93,6 @@ export function setStep(n) {
   store.swapMode       = false;
   store.swapSelected   = null;
   store.renamingTeamId = null;
-  store.readOnly       = false;
 }
 
 export function setFormField(key, value) {
@@ -268,11 +266,10 @@ export function loadDraw(id) {
   store.gks            = JSON.parse(JSON.stringify(entry.gks || []));
   store.gkAssignments  = [...(entry.gkAssignments || [])];
   store.swapMode       = false;
-  store.swapSelected = null;
-  store.history      = [];
+  store.swapSelected   = null;
+  store.history        = [];
   store.renamingTeamId = null;
-  store.readOnly     = true;
-  store.step         = 3;
+  store.step           = 8;
 }
 
 export function exportWhatsapp() {
