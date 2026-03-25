@@ -19,23 +19,22 @@ export function snakeDraft(players, playersPerTeam) {
   const gks      = [...players].filter(p => p.position === 'GK').sort((a, b) => b.level - a.level);
   const outfield = [...players].filter(p => p.position !== 'GK').sort((a, b) => b.level - a.level);
 
-  let inPlayGks, inPlayOutfield, reserves;
+  let draftPool, reserves;
 
   if (gkPriority) {
-    // GKs get guaranteed slots (up to 1 per team), outfield fills the rest
-    inPlayGks      = gks.slice(0, Math.min(gks.length, nTeams));
-    inPlayOutfield = outfield.slice(0, totalSlots - inPlayGks.length);
-    reserves       = [
-      ...gks.slice(inPlayGks.length),
-      ...outfield.slice(inPlayOutfield.length),
-    ].sort((a, b) => b.level - a.level);
+    // GKs vão na frente do pool (até 1 por time); restante ordenado por nível
+    const gksInPlay = gks.slice(0, Math.min(gks.length, nTeams));
+    const rest      = [...gks.slice(gksInPlay.length), ...outfield].sort((a, b) => b.level - a.level);
+    draftPool = [...gksInPlay, ...rest.slice(0, totalSlots - gksInPlay.length)];
+    reserves  = rest.slice(totalSlots - gksInPlay.length);
   } else {
-    // Outfield fills slots first; GKs only get what's left
-    inPlayOutfield = outfield.slice(0, Math.min(outfield.length, totalSlots));
-    inPlayGks      = gks.slice(0, totalSlots - inPlayOutfield.length);
-    reserves       = [
-      ...outfield.slice(inPlayOutfield.length),
-      ...gks.slice(inPlayGks.length),
+    // Linha preenche primeiro; goleiros ficam com o que sobra
+    const ofInPlay  = outfield.slice(0, Math.min(outfield.length, totalSlots));
+    const gksInPlay = gks.slice(0, totalSlots - ofInPlay.length);
+    draftPool = [...ofInPlay, ...gksInPlay];
+    reserves  = [
+      ...outfield.slice(ofInPlay.length),
+      ...gks.slice(gksInPlay.length),
     ].sort((a, b) => b.level - a.level);
   }
 
@@ -46,16 +45,8 @@ export function snakeDraft(players, playersPerTeam) {
     players: [],
   }));
 
-  if (gkPriority) {
-    // Draft GKs first (1 per team), then outfield + overflow GKs by level
-    _snakeInto(teams, inPlayGks);
-    const rest = [...inPlayOutfield].sort((a, b) => b.level - a.level);
-    _snakeInto(teams, rest);
-  } else {
-    // Draft outfield first by level, GKs fill remaining slots last
-    _snakeInto(teams, inPlayOutfield);
-    _snakeInto(teams, inPlayGks);
-  }
+  // Um único passe de snake garante exatamente playersPerTeam por time
+  _snakeInto(teams, draftPool);
 
   return { teams, reserves };
 }
