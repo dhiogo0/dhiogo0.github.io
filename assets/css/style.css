@@ -598,7 +598,8 @@ html, body {
 [data-tooltip]::after {
   content: attr(data-tooltip);
   position: absolute;
-  bottom: calc(100% + 7px);
+  top: calc(100% + 7px);
+  bottom: auto;
   left: 50%;
   transform: translateX(-50%);
   white-space: nowrap;
