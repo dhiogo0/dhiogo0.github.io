@@ -43,7 +43,7 @@ export function renderProfile() {
         <p class="card__headline">👤 MEU PERFIL</p>
 
         <div class="field">
-          <label class="field__label" for="nicknameInput">Apelido</label>
+          <label class="field__label" for="nicknameInput">Apelido do Racha</label>
           <input
             class="input"
             id="nicknameInput"
