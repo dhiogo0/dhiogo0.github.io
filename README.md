@@ -1,21 +1,27 @@
 # ⚽ Racha Fácil
 
-Sorteio inteligente e balanceado de times de futebol para peladas e rachas.  
-Roda direto no navegador, sem backend, sem instalação.
+Sorteio inteligente e balanceado de times de futebol para peladas e rachas.
+Roda direto no navegador. Dados sincronizados via Firebase (opcional).
 
 ---
 
 ## Funcionalidades
 
 - **Cadastro de jogadores** com nome, posição e nível de 1–5 estrelas
+- **Copiar/colar lista** de jogadores por texto
 - **Algoritmo Snake Draft** para balanceamento automático dos times
+- **Cabeça de chave** — jogadores fixados para equilibrar o sorteio
 - **Indicador de equilíbrio** visual (Excelente / Bom / Regular / Desnivelado)
 - **Modo de troca manual** — toque dois jogadores para trocar entre times
 - **Troca com reservas** — substitua qualquer jogador por um reserva
 - **Desfazer** a última troca
+- **Goleiros** — atribuição por time ou em rodízio
+- **Timer de partida** configurável, com alerta sonoro
+- **Modo campeonato** — round-robin ou fase de grupos + mata-mata
+- **Histórico de sorteios** — veja e recarregue sorteios anteriores
 - **Exportar para WhatsApp** com nome, posição e estrelas de cada time
-- **Persistência local** — jogadores salvos no navegador (localStorage)
-- **Animação de sorteio** antes de revelar os times
+- **Perfil e sincronização** — login Google para sincronizar jogadores e histórico entre dispositivos
+- **Persistência local** — dados salvos no navegador (localStorage) mesmo sem login
 
 ---
 
@@ -23,30 +29,40 @@ Roda direto no navegador, sem backend, sem instalação.
 
 ```
 racha-facil/
-├── index.html                  # Entry point HTML
+├── index.html                      # Entry point HTML
 ├── README.md
 ├── assets/
 │   └── css/
-│       └── style.css           # Stylesheet global
+│       └── style.css               # Stylesheet global
 └── src/
-    ├── app.js                  # Entry point JS — renderização e API pública (window.App)
+    ├── app.js                      # Entry point JS — renderização e API pública (window.App)
     ├── data/
-    │   └── constants.js        # Posições, nomes e cores dos times
+    │   └── constants.js            # Posições, nomes e cores dos times
     ├── state/
-    │   └── store.js            # Estado global + todas as actions
+    │   └── store.js                # Estado global + todas as actions
     ├── logic/
-    │   └── balance.js          # Snake draft, média, score de equilíbrio
+    │   ├── balance.js              # Snake draft, média, score de equilíbrio
+    │   └── championship.js         # Lógica de campeonato (standings, confrontos)
+    ├── firebase/
+    │   ├── config.js               # Configuração do Firebase
+    │   ├── auth.js                 # Autenticação Google
+    │   └── db.js                   # Sincronização Firestore
     ├── components/
-    │   ├── header.js           # Cabeçalho do app
-    │   ├── tabs.js             # Barra de navegação
-    │   ├── players.js          # Tela de cadastro de jogadores
-    │   ├── config.js           # Tela de configuração do sorteio
-    │   ├── drawing.js          # Animação de sorteio
-    │   └── teams.js            # Tela de times + swap + reservas
+    │   ├── header.js               # Cabeçalho do app
+    │   ├── bottomnav.js            # Barra de navegação inferior
+    │   ├── players.js              # Tela de cadastro de jogadores
+    │   ├── config.js               # Tela de configuração do sorteio
+    │   ├── drawing.js              # Animação de sorteio
+    │   ├── teams.js                # Tela de times + swap + reservas
+    │   ├── timer.js                # Timer de partida
+    │   ├── championship.js         # Tela de campeonato
+    │   ├── history.js              # Tela de histórico de sorteios
+    │   └── profile.js              # Tela de perfil e autenticação
     └── utils/
-        ├── helpers.js          # escHtml, starsDisplay, posIcon, posLabel
-        ├── storage.js          # Wrapper do localStorage
-        └── toast.js            # Sistema de notificações (toast)
+        ├── helpers.js              # escHtml, starsDisplay, posIcon, posLabel
+        ├── storage.js              # Wrapper do localStorage
+        ├── toast.js                # Sistema de notificações (toast)
+        └── morph.js                # Utilitário de transição de elementos
 ```
 
 ---
@@ -85,6 +101,8 @@ O app usa **Snake Draft**:
 
 Esse padrão garante que cada time receba um jogador forte, um médio e um fraco de forma alternada, resultando em médias muito próximas.
 
+**Cabeça de chave:** jogadores marcados como cabeça de chave são distribuídos primeiro (um por time) antes do snake draft, garantindo que times recebam âncoras equilibradas.
+
 ---
 
 ## Fluxo de telas
@@ -92,31 +110,38 @@ Esse padrão garante que cada time receba um jogador forte, um médio e um fraco
 ```
 [Jogadores]  →  [Configurar]  →  [Sorteando…]  →  [Times]
    Cadastro       Nº por time     Animação         Ver + Ajustar
+
+[Campeonato]  →  Tabela / Confrontos / Campeão
+[Histórico]   →  Sorteios anteriores → Ver times de um sorteio
+[Perfil]      →  Login Google, sincronização, configurações padrão
 ```
 
 ---
 
 ## Tecnologias
 
-| Camada     | Tecnologia                       |
-|------------|----------------------------------|
-| Markup     | HTML5 semântico                  |
-| Estilo     | CSS3 customizado (sem framework) |
-| Lógica     | JavaScript ES2022 (ES Modules)   |
-| Fontes     | Google Fonts (Barlow Condensed + Outfit) |
-| Persistência | localStorage                   |
-| Deploy     | Qualquer servidor estático       |
+| Camada       | Tecnologia                                      |
+|--------------|-------------------------------------------------|
+| Markup       | HTML5 semântico                                 |
+| Estilo       | CSS3 customizado (sem framework)                |
+| Lógica       | JavaScript ES2022 (ES Modules)                  |
+| Fontes       | Google Fonts (Barlow Condensed + Outfit)        |
+| Persistência | localStorage + Firestore (Firebase)             |
+| Auth         | Firebase Authentication (Google Sign-In)        |
+| Deploy       | Qualquer servidor estático                      |
 
 ---
 
 ## Deploy (produção)
 
-O projeto é 100% estático. Faça upload da pasta para qualquer host estático:
+O projeto é estático no front-end. Faça upload da pasta para qualquer host estático:
 
 - **GitHub Pages** — push para a branch `gh-pages`
 - **Netlify** — drag & drop da pasta no painel
 - **Vercel** — `vercel --prod` na raiz do projeto
 - **Qualquer CDN** — sirva os arquivos como estáticos
+
+Configure as variáveis do Firebase em `src/firebase/config.js` com as credenciais do seu projeto.
 
 ---
 
