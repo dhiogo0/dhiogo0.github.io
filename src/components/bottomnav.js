@@ -57,6 +57,7 @@ function _activeSection() {
   if (step === 0)              return 'add';
   if (step === 6)              return 'players';
   if (step >= 1 && step <= 3) return 'draw';
+  if (step === 7)              return 'draw';
   if (step === 4)              return 'championship';
   if (step === 5)              return 'profile';
   return 'add';

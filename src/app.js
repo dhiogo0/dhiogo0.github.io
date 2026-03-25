@@ -56,6 +56,7 @@ import { renderTeams }       from './components/teams.js';
 import { renderChampionship } from './components/championship.js';
 import { timerStart, timerPause, timerReset, timerSetDuration } from './components/timer.js';
 import { renderProfile }     from './components/profile.js';
+import { renderHistory }     from './components/history.js';
 
 import { signInWithGoogle, signOutUser, onAuthChange, handleRedirectResult } from './firebase/auth.js';
 import { loadUserData, saveUserData }                  from './firebase/db.js';
@@ -87,6 +88,7 @@ function render() {
   else if (step === 4) content = renderChampionship();
   else if (step === 5) content = renderProfile();
   else if (step === 6) content = renderPlayersList();
+  else if (step === 7) content = renderHistory();
 
   const isAnimating = step === 2;
 
@@ -125,6 +127,9 @@ window.App = {
         break;
       case 'players':
         setStep(6);
+        break;
+      case 'history':
+        setStep(7);
         break;
       case 'draw':
         if (store.players.length < 2 && !store.teams.length) return;
