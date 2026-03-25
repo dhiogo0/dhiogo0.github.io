@@ -15,7 +15,7 @@ export function renderTeams() {
       ${readOnly ? '' : _renderActions(swapMode, history)}
       ${!readOnly && swapMode ? _renderSwapHint(swapSelected) : ''}
       ${teams.map((t, i) => _renderTeamCard(t, i, readOnly ? false : swapMode, swapSelected, readOnly)).join('')}
-      ${reserves.length ? _renderReserves(reserves, readOnly ? false : swapMode, swapSelected) : ''}
+      ${reserves.length ? _renderReserves(reserves, readOnly ? false : swapMode, swapSelected, readOnly) : ''}
       ${gks.length ? _renderGkSection(gks, teams, gkAssignments, readOnly) : ''}
       ${readOnly ? _renderReadOnlyActions() : _renderChampionshipCTA(teams, championship)}
 
@@ -112,7 +112,7 @@ function _renderTeamCard(team, idx, swapMode, swapSelected, readOnly = false) {
       <div
         class="team-player ${swapMode ? 'team-player--swappable' : ''} ${isSel ? 'team-player--selected' : ''}"
         style="${isSel ? `border-color:${team.color};background:${team.color}18` : ''}"
-        onclick="App.clickTeamPlayer(${team.id},${p.id})">
+        ${readOnly ? '' : `onclick="App.clickTeamPlayer(${team.id},${p.id})"`}>
         <span class="team-player__icon">${posIcon(p.position)}</span>
         <span class="team-player__name">${escHtml(p.name)}</span>
         <span class="team-player__pos">${posLabel(p.position)}</span>
@@ -246,11 +246,11 @@ function _renderGkSection(gks, teams, gkAssignments) {
   `;
 }
 
-function _renderReserves(reserves, swapMode, swapSelected) {
+function _renderReserves(reserves, swapMode, swapSelected, readOnly = false) {
   const rows = reserves.map(p => `
     <div
       class="reserve-row ${swapMode && swapSelected ? 'reserve-row--targetable' : ''}"
-      onclick="App.clickReserve(${p.id})">
+      ${readOnly ? '' : `onclick="App.clickReserve(${p.id})"`}>
       <span class="reserve-row__icon">${posIcon(p.position)}</span>
       <span class="reserve-row__name">${escHtml(p.name)}</span>
       <span class="reserve-row__pos">${posLabel(p.position)}</span>
