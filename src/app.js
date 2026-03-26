@@ -61,6 +61,7 @@ import { renderChampionship } from './components/championship.js';
 import { timerStart, timerPause, timerReset, timerSetDuration } from './components/timer.js';
 import { renderProfile }     from './components/profile.js';
 import { renderHistory, renderHistoryView } from './components/history.js';
+import { initWeather }                      from './components/weather.js';
 
 import { signInWithGoogle, signOutUser, onAuthChange, handleRedirectResult } from './firebase/auth.js';
 import { loadUserData, saveUserData }                  from './firebase/db.js';
@@ -446,6 +447,10 @@ window.App = {
   },
 
   copyPlayerNames,
+
+  initWeather() {
+    initWeather(render);
+  },
 
   confirmPaste(mode) {
     const text = document.getElementById('pasteTextarea')?.value || '';

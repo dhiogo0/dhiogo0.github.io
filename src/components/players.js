@@ -1,6 +1,7 @@
 import { store, presentPlayers, numTeams } from '../state/store.js';
 import { POSITIONS }                    from '../data/constants.js';
 import { escHtml, posIcon, posLabel, starsDisplay, starsInput } from '../utils/helpers.js';
+import { renderWeather }                 from './weather.js';
 
 function _formFields() {
   const { form, starHover } = store;
@@ -78,15 +79,12 @@ export function renderAddPlayer() {
         </div>
       </div>
       ${statsBlock}
-      <div class="field-wrap">
-        ${fieldCaption ? `<p class="field-caption">${fieldCaption}</p>` : ''}
-        ${_renderInteractiveField(present, teams, ppt)}
-      </div>
+      ${renderWeather()}
     </div>
   `;
 }
 
-function _renderInteractiveField(present, teams, ppt) {
+export function renderInteractiveField(present, teams, ppt) {
   const W = 480, H = 196;
   const COLOR_A = '#00e87a', COLOR_B = '#00c8e8';
 

@@ -1,11 +1,14 @@
-import { store, numTeams, reserveCount } from '../state/store.js';
+import { store, numTeams, reserveCount, presentPlayers } from '../state/store.js';
+import { renderInteractiveField }        from './players.js';
 
 const PRESETS = [5, 6, 7, 11];
 
 export function renderConfig() {
   const { playersPerTeam, players } = store;
-  const nt = numTeams();
-  const rc = reserveCount();
+  const nt  = numTeams();
+  const rc  = reserveCount();
+  const present = presentPlayers();
+  const ppt = playersPerTeam;
 
   const presets = PRESETS
     .filter(n => n <= players.length)
@@ -69,6 +72,13 @@ export function renderConfig() {
           ${nt < 2 ? 'disabled' : ''}>
           ⚽ SORTEAR TIMES!
         </button>
+      </div>
+
+      <div class="config-bottom">
+        <div class="field-wrap">
+          <p class="field-caption">Como vão ficar os times no campo</p>
+          ${renderInteractiveField(present, nt, ppt)}
+        </div>
       </div>
     </div>
   `;
