@@ -428,7 +428,7 @@ html, body {
 .add-player-stats__arrow { font-size: 13px; color: var(--green); font-weight: 600; white-space: nowrap; }
 
 /* ── Header ── */
-.header { padding:22px 0 14px; text-align:center; }
+.header { padding:22px 0 14px; text-align:center; position:relative; }
 .header__ball {
   font-size:28px; line-height:1; margin-bottom:4px;
   animation: bounce 2.5s ease-in-out infinite;
@@ -441,6 +441,17 @@ html, body {
   font-size:11px; color:var(--dimmed);
   letter-spacing:2.5px; text-transform:uppercase; margin-top:2px;
 }
+.theme-pill {
+  position: absolute; top: 18px; right: 0;
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 1px solid var(--border2); background: var(--glass2);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 0.18s, transform 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.theme-pill:hover  { background: var(--glass2); filter: brightness(1.15); }
+.theme-pill:active { transform: scale(0.92); }
+.theme-pill__icon  { font-size: 15px; line-height: 1; user-select: none; }
 
 /* ── Tabs ── */
 .tabs {
@@ -1471,6 +1482,128 @@ html, body {
   background: rgba(255,255,255,0.07) !important;
   color: var(--dimmed) !important;
   cursor: default; pointer-events: none;
+}
+
+/* ── Theme Toggle Control ── */
+.theme-toggle {
+  display: flex;
+  gap: 0;
+  background: var(--glass);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin-top: 10px;
+}
+.theme-btn {
+  flex: 1; padding: 10px 6px;
+  border: none; background: transparent;
+  color: var(--muted); font-size: 12px; font-weight: 600;
+  font-family: var(--font-body); cursor: pointer;
+  transition: all 0.15s; letter-spacing: 0.3px;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+}
+.theme-btn__icon { font-size: 16px; line-height: 1; }
+.theme-btn + .theme-btn { border-left: 1px solid var(--border); }
+.theme-btn--active {
+  background: linear-gradient(135deg, var(--green), var(--cyan));
+  color: #000;
+}
+
+/* ── Light Theme ──────────────────────────────────────────── */
+:root[data-theme="light"] {
+  --bg:     #f0f6ff;
+  --bg2:    #e4edf9;
+  --bg3:    #d9e6f5;
+  --glass:  rgba(0,0,0,0.04);
+  --glass2: rgba(0,0,0,0.07);
+  --border:  rgba(0,0,0,0.10);
+  --border2: rgba(0,0,0,0.16);
+  --text:   #07101e;
+  --muted:  rgba(7,16,30,0.55);
+  --dimmed: rgba(7,16,30,0.35);
+}
+
+/* bg-mesh — orbs mais visíveis no fundo claro */
+:root[data-theme="light"] .bg-mesh::before {
+  background: radial-gradient(circle, rgba(0,232,122,0.20) 0%, transparent 65%);
+}
+:root[data-theme="light"] .bg-mesh::after {
+  background: radial-gradient(circle, rgba(0,200,232,0.15) 0%, transparent 65%);
+}
+
+/* Bottom nav — fundo claro */
+:root[data-theme="light"] .bottom-nav {
+  background: rgba(224, 237, 249, 0.94);
+}
+
+/* Textos hardcoded como #fff → var(--text) */
+:root[data-theme="light"] .header__title,
+:root[data-theme="light"] .team-card__name,
+:root[data-theme="light"] .current-match-name,
+:root[data-theme="light"] .hist-pill__name,
+:root[data-theme="light"] .add-player-hint__text strong,
+:root[data-theme="light"] .add-player-stats__count,
+:root[data-theme="light"] .preview-num,
+:root[data-theme="light"] .weather-widget__temp,
+:root[data-theme="light"] .weather-widget__stat-val,
+:root[data-theme="light"] .team-name-input { color: var(--text); }
+
+:root[data-theme="light"] .field-caption strong { color: rgba(7,16,30,0.75); }
+
+/* Backgrounds e bordas hardcoded rgba(255,255,255,...) → equivalentes escuros */
+:root[data-theme="light"] .input {
+  background: rgba(0,0,0,0.05);
+}
+:root[data-theme="light"] .icon-btn {
+  background: rgba(0,0,0,0.06);
+}
+:root[data-theme="light"] .btn--primary:disabled {
+  background: rgba(0,0,0,0.10);
+}
+:root[data-theme="light"] .balance-bar__track {
+  background: rgba(0,0,0,0.08);
+}
+:root[data-theme="light"] .timer-progress {
+  background: rgba(0,0,0,0.08);
+}
+:root[data-theme="light"] .weather-widget__stat {
+  background: rgba(0,0,0,0.05);
+}
+:root[data-theme="light"] .team-card__header {
+  border-bottom-color: rgba(0,0,0,0.06);
+}
+:root[data-theme="light"] .reserve-row {
+  border-bottom-color: rgba(0,0,0,0.05);
+}
+:root[data-theme="light"] .team-player--swappable:hover,
+:root[data-theme="light"] .reserve-row--targetable:hover,
+:root[data-theme="light"] .add-player-stats:hover {
+  background: rgba(0,0,0,0.05);
+}
+:root[data-theme="light"] .add-player-hint {
+  border-color: rgba(0,0,0,0.12);
+}
+:root[data-theme="light"] .add-player-stats {
+  border-color: rgba(0,0,0,0.08);
+}
+:root[data-theme="light"] .match-score-btn:disabled {
+  background: rgba(0,0,0,0.07) !important;
+}
+:root[data-theme="light"] .team-name-input {
+  background: rgba(0,0,0,0.06);
+  border-color: rgba(0,0,0,0.20);
+}
+:root[data-theme="light"] .team-card__name--editable:hover {
+  border-bottom-color: rgba(0,0,0,0.3);
+}
+
+/* Estrelas — cor vazia visível no fundo claro */
+:root[data-theme="light"] .star     { color: #b8cad9; }
+:root[data-theme="light"] .star-btn { color: #a0b5c8; }
+
+/* Tooltip — fundo claro */
+:root[data-theme="light"] [data-tooltip]::after {
+  background: rgba(224,237,249,0.97);
 }
 
 /* ── Responsive ── */

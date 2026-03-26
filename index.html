@@ -41,6 +41,15 @@
     rel="stylesheet"
   />
 
+  <!-- Theme: apply before first paint to prevent flash -->
+  <script>
+    (function () {
+      var t = localStorage.getItem('rf-theme') || 'system';
+      var dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.dataset.theme = t === 'system' ? (dark ? 'dark' : 'light') : t;
+    })();
+  </script>
+
   <!-- Styles -->
   <link rel="stylesheet" href="assets/css/style.css" />
 </head>

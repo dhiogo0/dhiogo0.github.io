@@ -100,7 +100,7 @@ function render() {
 
   morphHTML(
     root,
-    renderHeader() +
+    renderHeader(step) +
     `<main class="screen">${content}</main>` +
     (isAnimating ? '' : renderBottomNav()) +
     (store.importModal ? renderImportModal() : ''),
@@ -524,6 +524,33 @@ onAuthChange(async (user) => {
   render();
 });
 
+/* ── Theme management ── */
+function _applyTheme(preference) {
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const effective   = preference === 'system' ? (prefersDark ? 'dark' : 'light') : preference;
+  document.documentElement.dataset.theme = effective;
+}
+
+window.App.setTheme = function (preference) {
+  localStorage.setItem('rf-theme', preference);
+  _applyTheme(preference);
+  render();
+};
+
+window.App.getThemePreference = function () {
+  return localStorage.getItem('rf-theme') || 'system';
+};
+
+/* Re-apply on system preference change (only relevant when preference = 'system') */
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+  if ((localStorage.getItem('rf-theme') || 'system') === 'system') {
+    _applyTheme('system');
+  }
+});
+
 /* ── Boot ── */
+/* Garante que a preferência de tema esteja sempre gravada (padrão: sistema) */
+if (!localStorage.getItem('rf-theme')) localStorage.setItem('rf-theme', 'system');
+
 handleRedirectResult().catch(() => {});
 render();
