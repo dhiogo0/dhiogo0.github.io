@@ -331,9 +331,9 @@ function _renderMatchCard(c, m, readonly, scoringId, timerRunning = false, penal
         <p class="score-form__penalty-header">⚽ Empate! Definir por pênaltis</p>
         <div class="score-form">
           <span class="score-form__team">${homeDot}${homeN}</span>
-          <input type="number" inputmode="numeric" pattern="[0-9]*" class="score-input" id="php-${m.id}" min="0" max="99" value="0" />
+          <input type="number" inputmode="numeric" pattern="[0-9]*" class="score-input" id="php-${m.id}" min="0" max="99" value="0" onfocus="if(this.value==='0')this.value=''" onblur="if(this.value==='')this.value='0'" />
           <span class="score-form__sep">×</span>
-          <input type="number" inputmode="numeric" pattern="[0-9]*" class="score-input" id="pap-${m.id}" min="0" max="99" value="0" />
+          <input type="number" inputmode="numeric" pattern="[0-9]*" class="score-input" id="pap-${m.id}" min="0" max="99" value="0" onfocus="if(this.value==='0')this.value=''" onblur="if(this.value==='')this.value='0'" />
           <span class="score-form__team">${awayDot}${awayN}</span>
         </div>
         <div class="score-form__actions">
@@ -350,9 +350,9 @@ function _renderMatchCard(c, m, readonly, scoringId, timerRunning = false, penal
       <div class="match-card match-card--scoring">
         <div class="score-form">
           <span class="score-form__team">${homeDot}${homeN}</span>
-          <input type="number" inputmode="numeric" pattern="[0-9]*" class="score-input" id="sh-${m.id}" min="0" max="99" value="0" />
+          <input type="number" inputmode="numeric" pattern="[0-9]*" class="score-input" id="sh-${m.id}" min="0" max="99" value="0" onfocus="if(this.value==='0')this.value=''" onblur="if(this.value==='')this.value='0'" />
           <span class="score-form__sep">×</span>
-          <input type="number" inputmode="numeric" pattern="[0-9]*" class="score-input" id="sa-${m.id}" min="0" max="99" value="0" />
+          <input type="number" inputmode="numeric" pattern="[0-9]*" class="score-input" id="sa-${m.id}" min="0" max="99" value="0" onfocus="if(this.value==='0')this.value=''" onblur="if(this.value==='')this.value='0'" />
           <span class="score-form__team">${awayDot}${awayN}</span>
         </div>
         <div class="score-form__actions">
