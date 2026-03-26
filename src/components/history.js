@@ -50,14 +50,6 @@ function _renderEntry(entry, idx) {
       <div class="hist-entry__meta">
         <span class="hist-entry__date">📅 ${date}</span>
         <span class="hist-entry__info">${nTeams} times · ${entry.playersPerTeam}×${nTeams}${nRes ? ` · ${nRes} reserva${nRes > 1 ? 's' : ''}` : ''}</span>
-      </div>
-      <div class="hist-pills">${teamPills}</div>
-      <div class="hist-entry__actions">
-        <button
-          class="btn btn--ghost btn--sm hist-entry__btn"
-          onclick="App.loadDraw(${entry.id})">
-          Ver este sorteio →
-        </button>
         <button
           class="btn btn--ghost btn--sm hist-entry__del"
           onclick="App.requestDeleteEntry('draw', ${entry.id})"
@@ -65,6 +57,12 @@ function _renderEntry(entry, idx) {
           🗑️
         </button>
       </div>
+      <div class="hist-pills">${teamPills}</div>
+      <button
+        class="btn btn--ghost btn--sm hist-entry__btn"
+        onclick="App.loadDraw(${entry.id})">
+        Ver este sorteio →
+      </button>
     </div>
   `;
 }
