@@ -75,7 +75,7 @@ export function renderConfig() {
       </div>
 
       <div class="config-bottom">
-        <div class="field-wrap">
+        <div class="field-wrap" data-morph-key="field-${ppt}-${present.length}">
           <p class="field-caption">Como vão ficar os times no campo</p>
           ${renderInteractiveField(present, nt, ppt)}
         </div>

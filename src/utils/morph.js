@@ -6,10 +6,12 @@
 function _syncAttrs(from, to) {
   for (let i = from.attributes.length - 1; i >= 0; i--) {
     const { name } = from.attributes[i];
+    if (name === 'xmlns') continue;
     if (!to.hasAttribute(name)) from.removeAttribute(name);
   }
   for (let i = 0; i < to.attributes.length; i++) {
     const { name, value } = to.attributes[i];
+    if (name === 'xmlns') continue;
     if (from.getAttribute(name) !== value) from.setAttribute(name, value);
   }
 }
@@ -34,6 +36,12 @@ function _morphChildren(from, to) {
       from.replaceChild(t.cloneNode(true), f);
     } else if (f.nodeType === 3) {
       if (f.textContent !== t.textContent) f.textContent = t.textContent;
+    } else if (
+      f.nodeType === 1 &&
+      f.getAttribute('data-morph-key') !== null &&
+      f.getAttribute('data-morph-key') !== t.getAttribute('data-morph-key')
+    ) {
+      from.replaceChild(t.cloneNode(true), f);
     } else {
       _syncAttrs(f, t);
       _morphChildren(f, t);
