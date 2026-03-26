@@ -296,26 +296,20 @@ export function exportWhatsapp() {
   store.teams.forEach(t => {
     txt += `*${t.name}*\n`;
     t.players.forEach(p => {
-      txt += `${_emojiForPos(p.position)} ${p.name} — ${'⭐'.repeat(p.level)}\n`;
+      txt += `${_emojiForPos(p.position)} ${p.name}\n`;
     });
-    const avg = (t.players.reduce((s, p) => s + p.level, 0) / t.players.length).toFixed(1);
-    txt += `_Média: ${avg} ⭐_\n\n`;
+    txt += '\n';
   });
   if (store.reserves.length) {
     txt += '*🔄 Reservas*\n';
     store.reserves.forEach(p => { txt += `${_emojiForPos(p.position)} ${p.name}\n`; });
   }
   if (store.gks.length) {
-    txt += '\n*🧤 Goleiros*\n';
-    const isTeamMode = store.gks.length === store.teams.length;
-    const isRotation = !isTeamMode && store.gks.length === 3;
+    txt += '\n*Goleiros*\n';
     store.gkAssignments.forEach((gkId, idx) => {
       const gk = store.gks.find(g => g.id === gkId);
       if (!gk) return;
-      let assign;
-      if (isTeamMode)        assign = store.teams[idx]?.name || '—';
-      else if (isRotation)   assign = idx < 2 ? `Em quadra (Lado ${idx === 0 ? 'A' : 'B'})` : 'Aguardando';
-      else                   assign = idx === 0 ? 'Lado A' : idx === 1 ? 'Lado B' : 'Aguardando';
+      const assign = idx === 0 ? 'Lado A' : idx === 1 ? 'Lado B' : 'Aguardando';
       txt += `🧤 ${gk.name} — ${assign}\n`;
     });
   }

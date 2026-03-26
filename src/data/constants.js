@@ -1,8 +1,8 @@
 export const POSITIONS = [
   { id: 'GK',  label: 'Goleiro',   emoji: '🧤' },
   { id: 'DEF', label: 'Defensor',  emoji: '🛡️' },
-  { id: 'MID', label: 'Meio',      emoji: '⚙️' },
-  { id: 'ATK', label: 'Atacante',  emoji: '⚡' },
+  { id: 'MID', label: 'Meio',      emoji: '⚽' },
+  { id: 'ATK', label: 'Atacante',  emoji: '🗡️' },
 ];
 
 export const TEAM_NAMES = [
