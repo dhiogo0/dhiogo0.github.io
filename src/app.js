@@ -108,7 +108,7 @@ function render() {
   /* Auto-focus player name input when editing modal is open */
   if (step === 6 && store.editModal) {
     const inp = document.getElementById('nameInput');
-    if (inp) {
+    if (inp && inp.type === 'text') {
       inp.focus();
       inp.setSelectionRange(inp.value.length, inp.value.length);
     }
@@ -418,6 +418,9 @@ window.App = {
         showToast('Arquivo inválido.', 'error');
       }
     };
+    reader.onerror = () => {
+      showToast('Erro ao ler o arquivo.', 'error');
+    };
     reader.readAsText(file);
   },
 
@@ -482,7 +485,6 @@ window.App = {
 /* ── Auth state listener ── */
 onAuthChange(async (user) => {
   store.currentUser = user;
-  render(); // atualiza botão imediatamente ao mudar estado de auth
 
   if (user) {
     try {
@@ -512,8 +514,9 @@ onAuthChange(async (user) => {
     }
     const firstName = user.displayName?.split(' ')[0] || 'jogador';
     showToast(`Bem-vindo, ${firstName}!`);
-    render(); // segundo render com os dados carregados
   }
+
+  render();
 });
 
 /* ── Boot ── */

@@ -24,8 +24,11 @@ export function snakeDraft(players, playersPerTeam) {
   const anchoredSeeds = seeds.slice(0, nTeams);
   const extraSeeds    = seeds.slice(nTeams);
 
-  // Embaralha seeds ancoradas e distribui uma por time
-  anchoredSeeds.sort(() => Math.random() - 0.5);
+  // Embaralha seeds ancoradas e distribui uma por time (Fisher-Yates)
+  for (let i = anchoredSeeds.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [anchoredSeeds[i], anchoredSeeds[j]] = [anchoredSeeds[j], anchoredSeeds[i]];
+  }
   anchoredSeeds.forEach((seed, i) => teams[i].players.push(seed));
 
   // Pool restante: regular + seeds excedentes, ordenado por nível

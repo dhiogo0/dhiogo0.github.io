@@ -427,6 +427,6 @@ function _phaseLabel(phase) {
 }
 
 function _groupSortKey(key) {
-  if (key.startsWith('Rodada')) return -1000 + parseInt(key.split(' ')[1]);
+  if (key.startsWith('Rodada')) return -1000 + parseInt(key.split(' ')[1], 10);
   return { 'Quartas de Final': 1, 'Semifinal': 2, 'Final': 3 }[key] ?? 0;
 }

@@ -127,7 +127,7 @@ export function addOrUpdatePlayer() {
     store.editModal = false;
     showToast('Jogador atualizado!');
   } else {
-    store.players.push({ id: Date.now(), name: name.trim(), position, level });
+    store.players.push({ id: Date.now() + Math.floor(Math.random() * 1000), name: name.trim(), position, level });
     showToast('Jogador adicionado!');
   }
   store.form = { ...INITIAL_FORM };
@@ -174,7 +174,12 @@ export function draw(onDone) {
   store.step = 2;
   setTimeout(() => {
     const gkPlayers = presentGks();
-    const outfield  = [...presentOutfield()].sort(() => Math.random() - 0.5);
+    const outfieldArr = [...presentOutfield()];
+    for (let i = outfieldArr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [outfieldArr[i], outfieldArr[j]] = [outfieldArr[j], outfieldArr[i]];
+    }
+    const outfield = outfieldArr;
     const result    = snakeDraft(outfield, store.playersPerTeam);
     store.teams          = result.teams;
     store.reserves       = result.reserves;
@@ -491,9 +496,11 @@ export async function exportPlayersFile() {
 }
 
 export function parsePlayersText(text) {
-  return text.trim().split('\n').filter(Boolean).map(line => {
+  const MAX_CHARS = 50_000;
+  const safe = text.length > MAX_CHARS ? text.slice(0, MAX_CHARS) : text;
+  return safe.trim().split('\n').filter(Boolean).slice(0, 200).map(line => {
     const [name, position, level] = line.split('|');
-    return { name: name?.trim(), position: position?.trim() || 'MID', level: parseInt(level) || 3 };
+    return { name: name?.trim(), position: position?.trim() || 'MID', level: parseInt(level, 10) || 3 };
   }).filter(p => p.name);
 }
 
@@ -529,7 +536,7 @@ export function closeImportModal() {
 export function confirmImport(mode) {
   const base = Date.now();
   const newPlayers = store.importCandidates.map((p, i) => ({
-    id:       base + i,
+    id:       base + i * 1000 + Math.floor(Math.random() * 1000),
     name:     p.name,
     position: p.position || 'MID',
     level:    p.level    || 3,

@@ -1,4 +1,4 @@
-const CACHE = 'racha-facil-v7';
+const CACHE = 'racha-facil-v8';
 
 const STATIC_ASSETS = [
   '/assets/icons/icon.svg',
