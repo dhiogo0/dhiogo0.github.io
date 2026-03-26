@@ -257,6 +257,18 @@ window.App = {
 
   exportWhatsapp,
 
+  async shareApp() {
+    const url   = 'https://dhiogo0.github.io/';
+    const title = 'Racha Fácil';
+    const text  = 'Sorteio inteligente de times de futebol ⚽';
+    if (navigator.share) {
+      try { await navigator.share({ title, text, url }); } catch {}
+    } else {
+      await navigator.clipboard.writeText(url);
+      showToast('Link copiado! 📋');
+    }
+  },
+
   startRenameTeam(teamId) {
     startRenameTeam(teamId);
     render();

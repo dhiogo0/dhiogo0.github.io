@@ -39,6 +39,15 @@ export function renderProfile() {
 
       ${authSection}
 
+      <div class="card share-app-card" style="margin-bottom:16px;text-align:center">
+        <p class="share-app-card__emoji">⚽</p>
+        <p class="share-app-card__title">Gostou do Racha Fácil?</p>
+        <p class="share-app-card__sub">Compartilhe com seus amigos e monte o racha mais equilibrado!</p>
+        <button class="btn btn--primary" onclick="App.shareApp()">
+          🔗 Compartilhar o app
+        </button>
+      </div>
+
       <div class="card" style="margin-bottom:16px">
         <p class="card__headline">👤 MEU PERFIL</p>
 
