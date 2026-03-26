@@ -19,6 +19,9 @@ self.addEventListener('message', event => {
   });
 });
 
+/* ── Dev: bypass all caching on localhost ── */
+const IS_DEV = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
+
 /* ── Install: pre-cache only static assets ── */
 self.addEventListener('install', event => {
   event.waitUntil(
@@ -39,6 +42,7 @@ self.addEventListener('activate', event => {
 
 /* ── Fetch ── */
 self.addEventListener('fetch', event => {
+  if (IS_DEV) return; // em dev, deixa o browser buscar direto (sem cache do SW)
   if (event.request.method !== 'GET') return;
 
   const url = new URL(event.request.url);
