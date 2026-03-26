@@ -22,6 +22,7 @@ Roda direto no navegador. Dados sincronizados via Firebase (opcional).
 - **Exportar para WhatsApp** com nome, posição e estrelas de cada time
 - **Perfil e sincronização** — login Google para sincronizar jogadores e histórico entre dispositivos
 - **Persistência local** — dados salvos no navegador (localStorage) mesmo sem login
+- **Campo interativo** — visualização dos jogadores posicionados no campo antes do sorteio
 
 ---
 
@@ -36,6 +37,7 @@ racha-facil/
 │       └── style.css               # Stylesheet global
 └── src/
     ├── app.js                      # Entry point JS — renderização e API pública (window.App)
+    ├── version.js                  # Versão do app (APP_VERSION)
     ├── data/
     │   └── constants.js            # Posições, nomes e cores dos times
     ├── state/

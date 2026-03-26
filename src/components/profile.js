@@ -1,5 +1,6 @@
 import { store } from '../state/store.js';
 import { escHtml } from '../utils/helpers.js';
+import { APP_VERSION } from '../version.js';
 
 export function renderProfile() {
   const { profile, players, drawHistory, championshipHistory, playersPerTeam, currentUser } = store;
@@ -103,6 +104,8 @@ export function renderProfile() {
 
       ${_renderChampionshipHistory(championshipHistory)}
       ${_renderDrawHistory(drawHistory)}
+
+      <p class="app-version">v${APP_VERSION}</p>
 
     </div>
   `;
