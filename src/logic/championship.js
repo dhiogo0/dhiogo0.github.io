@@ -113,6 +113,12 @@ export function registerScore(championship, matchId, homeScore, awayScore, penal
   const m = championship.matches.find(x => x.id === matchId);
   if (!m || m.status === 'done') return;
 
+  const isKnockoutPhase = m.phase !== 'group';
+  const isTie = homeScore === awayScore;
+
+  // Em fases eliminatórias, empate sem pênaltis não é um resultado válido
+  if (isKnockoutPhase && isTie && !penalties) return;
+
   m.homeScore  = homeScore;
   m.awayScore  = awayScore;
   m.status     = 'done';
@@ -150,7 +156,7 @@ export function registerScore(championship, matchId, homeScore, awayScore, penal
 }
 
 function _propagate(matches, done) {
-  if (!done.winnerId) return;
+  if (done.winnerId == null) return;
   for (const m of matches) {
     let updated = false;
     if (m.homeFromMatchId === done.id) { m.homeTeamId = done.winnerId; updated = true; }
@@ -164,7 +170,11 @@ function _propagate(matches, done) {
 export function repropagateKnockout(championship) {
   if (championship.format !== 'knockout') return;
   for (const m of championship.matches) {
-    if (m.status === 'done' && m.winnerId) {
+    // Recupera winnerId de matches done com pênaltis mas sem winnerId (estado corrompido)
+    if (m.status === 'done' && m.winnerId == null && m.homePenalties != null) {
+      m.winnerId = m.homePenalties > m.awayPenalties ? m.homeTeamId : m.awayTeamId;
+    }
+    if (m.status === 'done' && m.winnerId != null) {
       _propagate(championship.matches, m);
     }
   }
