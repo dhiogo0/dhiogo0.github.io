@@ -89,7 +89,7 @@ export function loadChampionshipHistory() {
 
 export function saveChampionshipHistory(history) {
   try {
-    localStorage.setItem(KEYS.CHAMP_HIST, JSON.stringify(history.slice(0, 20)));
+    localStorage.setItem(KEYS.CHAMP_HIST, JSON.stringify(history.slice(0, 10)));
   } catch {
     console.warn('localStorage unavailable');
   }

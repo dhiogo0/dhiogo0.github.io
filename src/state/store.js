@@ -493,7 +493,7 @@ export function deleteChampionshipEntry(createdAt) {
 function _archiveChampionship() {
   const c = store.championship;
   if (!c) return;
-  store.championshipHistory = [c, ...store.championshipHistory].slice(0, 20);
+  store.championshipHistory = [c, ...store.championshipHistory].slice(0, 10);
   saveChampionshipHistory(store.championshipHistory);
 }
 
@@ -594,7 +594,7 @@ function _pushDrawHistory() {
     gks:            JSON.parse(JSON.stringify(store.gks)),
     gkAssignments:  [...store.gkAssignments],
   };
-  store.drawHistory = [entry, ...store.drawHistory].slice(0, 20);
+  store.drawHistory = [entry, ...store.drawHistory].slice(0, 10);
   saveHistory(store.drawHistory);
 }
 
