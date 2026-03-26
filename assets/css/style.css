@@ -82,7 +82,7 @@ html, body {
 }
 .add-player-screen .card { width: 100%; }
 
-.app-version { text-align: center; font-size: 11px; color: var(--dimmed); opacity: .5; margin-top: 24px; }
+.app-version { text-align: center; font-size: 11px; color: var(--dimmed); margin-top: 24px; }
 .field-wrap { display: flex; flex-direction: column; gap: 8px; }
 .field-caption {
   font-size: 12px;
@@ -522,14 +522,14 @@ html, body {
 .stars-input { display:flex; gap:5px; align-items:center; }
 .star-btn {
   font-size:26px; cursor:pointer; line-height:1;
-  color:#2a3f55; transition:all 0.12s; user-select:none;
+  color:rgba(221,240,255,0.18); transition:all 0.12s; user-select:none;
 }
 .star-btn--lit  { color:var(--gold); }
 .star-btn:hover { transform:scale(1.2); }
 
 /* Stars display (read-only) */
 .stars-row { display:inline-flex; gap:1px; }
-.star       { color:#1e2e3e; }
+.star       { color:rgba(221,240,255,0.15); }
 .star--lit  { color:var(--gold); }
 
 /* ── Buttons ── */
@@ -769,7 +769,7 @@ html, body {
 
 .reserve-row {
   display:flex; align-items:center; gap:9px;
-  padding:9px 14px; border-bottom:1px solid rgba(255,255,255,0.04);
+  padding:9px 14px; border-bottom:1px solid rgba(255,255,255,0.07);
   transition:all 0.15s;
 }
 .reserve-row:last-child    { border-bottom:none; }
@@ -1039,7 +1039,7 @@ html, body {
 
 .player-row--seed { border-left: 3px solid #fbbf24; }
 
-.seed-btn { opacity: 0.35; transition: opacity 0.15s, color 0.15s; }
+.seed-btn { opacity: 0.45; transition: opacity 0.15s, color 0.15s; }
 .seed-btn:hover { opacity: 0.7; }
 .seed-btn--on { opacity: 1; color: #fbbf24; }
 
@@ -1143,7 +1143,7 @@ html, body {
 .standings-th--team { text-align: left; padding-left: 14px; }
 .standings-table td {
   padding: 10px 8px; text-align: center;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
 }
 .standings-table tbody tr:last-child td { border-bottom: none; }
 .standings-table td:nth-child(2) { text-align: left; padding-left: 14px; }
@@ -1176,7 +1176,7 @@ html, body {
 }
 .match-card--done {
   display: flex; align-items: center; gap: 6px;
-  background: rgba(255,255,255,0.02);
+  background: rgba(255,255,255,0.04);
   position: relative;
 }
 .match-card--waiting {
@@ -1209,7 +1209,7 @@ html, body {
 .score-form__sep   { color: var(--dimmed); font-weight: 700; flex-shrink: 0; }
 .score-input {
   width: 52px; padding: 8px 6px; text-align: center;
-  background: rgba(255,255,255,0.07);
+  background: rgba(255,255,255,0.11);
   border: 1px solid var(--border2); border-radius: 8px;
   color: #fff; font-size: 18px; font-family: var(--font-display); font-weight: 800;
   outline: none; flex-shrink: 0;
@@ -1228,7 +1228,7 @@ html, body {
 
 /* ── GK section ── */
 .gk-section {
-  background: rgba(255,255,255,0.03);
+  background: rgba(255,255,255,0.05);
   border: 1px solid var(--border2);
   border-radius: 14px;
   overflow: hidden;
@@ -1604,6 +1604,31 @@ html, body {
 /* Tooltip — fundo claro */
 :root[data-theme="light"] [data-tooltip]::after {
   background: rgba(224,237,249,0.97);
+}
+
+/* Textos #fff em modal, campeonato, placar e GK */
+:root[data-theme="light"] .modal__title,
+:root[data-theme="light"] .champ-header__name,
+:root[data-theme="light"] .match-scoreline,
+:root[data-theme="light"] .score-input,
+:root[data-theme="light"] .gk-ctrl-btn { color: var(--text); }
+
+/* Backgrounds rgba(255,255,255,...) em hover, inputs e seções */
+:root[data-theme="light"] .presence-btn:hover { background: rgba(0,0,0,0.06); }
+:root[data-theme="light"] .match-card--done   { background: rgba(0,0,0,0.03); }
+:root[data-theme="light"] .score-input        { background: rgba(0,0,0,0.06); }
+:root[data-theme="light"] .gk-section         { background: rgba(0,0,0,0.03); }
+:root[data-theme="light"] .gk-ctrl-btn        { background: rgba(0,0,0,0.06); }
+
+/* Borda da tabela de classificação */
+:root[data-theme="light"] .standings-table td { border-bottom-color: rgba(0,0,0,0.06); }
+
+/* Campo SVG — linhas e marcadores brancos ficam invisíveis no fundo claro */
+:root[data-theme="light"] .field-illustration--interactive {
+  stroke: rgba(7,16,30,0.22);
+}
+:root[data-theme="light"] .field-illustration--interactive circle[stroke="none"] {
+  fill: rgba(7,16,30,0.25);
 }
 
 /* ── Responsive ── */
