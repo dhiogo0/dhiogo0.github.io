@@ -48,7 +48,7 @@ export function renderProfile() {
             class="input"
             id="nicknameInput"
             type="text"
-            placeholder="Como te chamam no racha?"
+            placeholder="Como chamam o seu racha?"
             maxlength="30"
             value="${escHtml(profile.nickname)}"
             onblur="App.updateProfile('nickname', this.value)"

@@ -356,7 +356,7 @@ window.App = {
     store.reserves = [];
     store.history  = [];
     store.readOnly = false;
-    setStep(0);
+    setStep(1);
     render();
   },
 
