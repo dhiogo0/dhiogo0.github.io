@@ -1,6 +1,7 @@
-const CACHE = 'racha-facil-v9';
+const CACHE = 'racha-facil-v10';
 
 const STATIC_ASSETS = [
+  '/',
   '/assets/icons/icon.svg',
   '/assets/icons/og-image.svg',
   '/manifest.json',
@@ -96,7 +97,7 @@ self.addEventListener('fetch', event => {
         caches.open(CACHE).then(cache => cache.put(event.request, clone));
         return res;
       }).catch(() =>
-        caches.match(event.request).then(cached => cached || caches.match('/index.html'))
+        caches.match(event.request).then(cached => cached || caches.match('/'))
       )
     );
   }
