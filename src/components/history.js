@@ -60,7 +60,7 @@ function _renderEntry(entry, idx) {
         </button>
         <button
           class="btn btn--ghost btn--sm hist-entry__del"
-          onclick="if(confirm('Excluir este sorteio do histórico?')) App.deleteHistoryEntry(${entry.id})"
+          onclick="App.requestDeleteEntry('draw', ${entry.id})"
           data-tooltip="Excluir">
           🗑️
         </button>

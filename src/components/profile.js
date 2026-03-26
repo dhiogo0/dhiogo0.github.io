@@ -135,7 +135,7 @@ function _renderChampionshipHistory(history) {
         <div class="hist-entry__actions">
           <button
             class="btn btn--ghost btn--sm hist-entry__del"
-            onclick="if(confirm('Excluir este campeonato do histórico?')) App.deleteChampionshipEntry('${c.createdAt}')"
+            onclick="App.requestDeleteEntry('championship', '${c.createdAt}')"
             data-tooltip="Excluir">
             🗑️
           </button>
@@ -179,7 +179,7 @@ function _renderDrawHistory(drawHistory) {
           </button>
           <button
             class="btn btn--ghost btn--sm hist-entry__del"
-            onclick="if(confirm('Excluir este sorteio do histórico?')) App.deleteHistoryEntry(${entry.id})"
+            onclick="App.requestDeleteEntry('draw', ${entry.id})"
             data-tooltip="Excluir">
             🗑️
           </button>

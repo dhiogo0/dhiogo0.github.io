@@ -21,6 +21,9 @@ import {
   loadDraw,
   deleteHistoryEntry,
   deleteChampionshipEntry,
+  requestDeleteEntry,
+  cancelDeleteEntry,
+  confirmDeleteEntry,
   updateProfile,
   togglePresence,
   toggleAllPresence,
@@ -72,6 +75,22 @@ import { morphHTML }                                   from './utils/morph.js';
 /* ── Root element ── */
 const root = document.getElementById('app');
 
+function _renderDeleteConfirmModal({ type }) {
+  const label = type === 'championship' ? 'campeonato' : 'sorteio';
+  return `
+    <div class="modal-backdrop" onclick="App.cancelDeleteEntry()">
+      <div class="modal modal--sm" onclick="event.stopPropagation()">
+        <p class="modal__title">Excluir ${label}?</p>
+        <p class="modal__body">Este ${label} será removido do histórico permanentemente.</p>
+        <div class="btn-row" style="margin-top:18px">
+          <button class="btn btn--primary btn--danger" onclick="App.confirmDeleteEntry()">Excluir</button>
+          <button class="btn btn--ghost btn--sm" onclick="App.cancelDeleteEntry()">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 /* ── Cloud sync ── */
 function _syncToCloud() {
   const user = store.currentUser;
@@ -105,7 +124,8 @@ function render() {
     renderHeader(step) +
     `<main class="screen">${content}</main>` +
     (isAnimating ? '' : renderBottomNav()) +
-    (store.importModal ? renderImportModal() : ''),
+    (store.importModal ? renderImportModal() : '') +
+    (store.confirmDeleteEntry ? _renderDeleteConfirmModal(store.confirmDeleteEntry) : ''),
   );
 
   /* Auto-focus player name input when editing modal is open */
@@ -299,6 +319,21 @@ window.App = {
 
   deleteChampionshipEntry(createdAt) {
     deleteChampionshipEntry(createdAt);
+    render();
+  },
+
+  requestDeleteEntry(type, key) {
+    requestDeleteEntry(type, key);
+    render();
+  },
+
+  cancelDeleteEntry() {
+    cancelDeleteEntry();
+    render();
+  },
+
+  confirmDeleteEntry() {
+    confirmDeleteEntry();
     render();
   },
 

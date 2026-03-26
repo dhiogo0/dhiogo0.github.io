@@ -50,6 +50,7 @@ export const store = {
   penaltyMatchId:        null,
   pendingScore:          null,
   confirmEndChampionship: false,
+  confirmDeleteEntry:     null,
   championshipUndo:      null,
   profile: {
     nickname:              _savedProfile.nickname              || '',
@@ -286,6 +287,26 @@ export function loadDraw(id) {
   if (!entry) return;
   store.historyEntry = JSON.parse(JSON.stringify(entry));
   store.step         = 8;
+}
+
+export function requestDeleteEntry(type, key) {
+  store.confirmDeleteEntry = { type, key };
+}
+
+export function cancelDeleteEntry() {
+  store.confirmDeleteEntry = null;
+}
+
+export function confirmDeleteEntry() {
+  const { type, key } = store.confirmDeleteEntry || {};
+  if (type === 'draw') {
+    store.drawHistory = store.drawHistory.filter(e => e.id !== key);
+    saveHistory(store.drawHistory);
+  } else if (type === 'championship') {
+    store.championshipHistory = store.championshipHistory.filter(c => c.createdAt !== key);
+    saveChampionshipHistory(store.championshipHistory);
+  }
+  store.confirmDeleteEntry = null;
 }
 
 export function deleteHistoryEntry(id) {
