@@ -132,6 +132,14 @@ function _renderChampionshipHistory(history) {
               <span class="hist-pill__name">🏆 ${escHtml(champion.name)}</span>
             </div>
           </div>` : ''}
+        <div class="hist-entry__actions">
+          <button
+            class="btn btn--ghost btn--sm hist-entry__del"
+            onclick="if(confirm('Excluir este campeonato do histórico?')) App.deleteChampionshipEntry('${c.createdAt}')"
+            data-tooltip="Excluir">
+            🗑️
+          </button>
+        </div>
       </div>
     `;
   }).join('');
@@ -165,9 +173,17 @@ function _renderDrawHistory(drawHistory) {
           <span class="hist-entry__info">${entry.teams.length} times · ${entry.playersPerTeam}×${entry.teams.length}${nRes ? ` · ${nRes} reserva${nRes > 1 ? 's' : ''}` : ''}</span>
         </div>
         <div class="hist-pills">${pills}</div>
-        <button class="btn btn--ghost btn--sm hist-entry__btn" onclick="App.loadDraw(${entry.id})">
-          Ver este sorteio →
-        </button>
+        <div class="hist-entry__actions">
+          <button class="btn btn--ghost btn--sm hist-entry__btn" onclick="App.loadDraw(${entry.id})">
+            Ver este sorteio →
+          </button>
+          <button
+            class="btn btn--ghost btn--sm hist-entry__del"
+            onclick="if(confirm('Excluir este sorteio do histórico?')) App.deleteHistoryEntry(${entry.id})"
+            data-tooltip="Excluir">
+            🗑️
+          </button>
+        </div>
       </div>
     `;
   }).join('');

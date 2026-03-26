@@ -19,6 +19,8 @@ import {
   cancelRenameTeam,
   moveGk,
   loadDraw,
+  deleteHistoryEntry,
+  deleteChampionshipEntry,
   updateProfile,
   togglePresence,
   toggleAllPresence,
@@ -287,6 +289,16 @@ window.App = {
 
   loadDraw(id) {
     loadDraw(id);
+    render();
+  },
+
+  deleteHistoryEntry(id) {
+    deleteHistoryEntry(id);
+    render();
+  },
+
+  deleteChampionshipEntry(createdAt) {
+    deleteChampionshipEntry(createdAt);
     render();
   },
 

@@ -288,6 +288,11 @@ export function loadDraw(id) {
   store.step         = 8;
 }
 
+export function deleteHistoryEntry(id) {
+  store.drawHistory = store.drawHistory.filter(e => e.id !== id);
+  saveHistory(store.drawHistory);
+}
+
 export function exportWhatsapp() {
   const name = store.profile.nickname
     ? store.profile.nickname.toUpperCase()
@@ -457,6 +462,11 @@ export function archiveAndClearChampionship() {
   store.scoringMatchId         = null;
   store.confirmEndChampionship = false;
   clearChampionship();
+}
+
+export function deleteChampionshipEntry(createdAt) {
+  store.championshipHistory = store.championshipHistory.filter(c => c.createdAt !== createdAt);
+  saveChampionshipHistory(store.championshipHistory);
 }
 
 function _archiveChampionship() {

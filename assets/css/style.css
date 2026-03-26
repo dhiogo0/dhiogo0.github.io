@@ -844,9 +844,16 @@ html, body {
 .hist-pill__avg {
   font-size: 11px; font-weight: 600;
 }
-.hist-entry__btn {
-  width: 100%; text-align: center; justify-content: center;
+.hist-entry__actions {
+  display: flex; gap: 8px; align-items: center;
 }
+.hist-entry__btn {
+  flex: 1; text-align: center; justify-content: center;
+}
+.hist-entry__del {
+  flex-shrink: 0; padding: 0 10px; opacity: 0.6;
+}
+.hist-entry__del:hover { opacity: 1; color: var(--red, #f55); }
 
 /* ── Auth card ── */
 .auth-card {
