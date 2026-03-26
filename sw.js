@@ -1,9 +1,15 @@
-const CACHE = 'racha-facil-v8';
+const CACHE = 'racha-facil-v9';
 
 const STATIC_ASSETS = [
   '/assets/icons/icon.svg',
   '/assets/icons/og-image.svg',
   '/manifest.json',
+];
+
+const EXTERNAL_ASSETS = [
+  'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js',
+  'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js',
+  'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js',
 ];
 
 /* ── Notificacao de fim de timer ── */
@@ -25,7 +31,14 @@ const IS_DEV = self.location.hostname === 'localhost' || self.location.hostname 
 /* ── Install: pre-cache only static assets ── */
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE).then(cache => cache.addAll(STATIC_ASSETS))
+    caches.open(CACHE).then(cache =>
+      Promise.all([
+        cache.addAll(STATIC_ASSETS),
+        ...EXTERNAL_ASSETS.map(url =>
+          fetch(url).then(res => cache.put(url, res)).catch(() => {})
+        ),
+      ])
+    )
   );
   self.skipWaiting();
 });
@@ -47,10 +60,11 @@ self.addEventListener('fetch', event => {
 
   const url = new URL(event.request.url);
 
-  // Google Fonts: cache-first (raramente mudam)
+  // Firebase SDK + Google Fonts: cache-first (imutáveis por versão/hash)
   if (
     url.hostname === 'fonts.googleapis.com' ||
-    url.hostname === 'fonts.gstatic.com'
+    url.hostname === 'fonts.gstatic.com' ||
+    url.hostname === 'www.gstatic.com'
   ) {
     event.respondWith(
       caches.open(CACHE).then(cache =>
