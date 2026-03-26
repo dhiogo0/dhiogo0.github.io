@@ -144,11 +144,11 @@ function _renderInteractiveField(present, teams, ppt) {
   const dotsB = posGroup(teamBPlayers, 'B', COLOR_B);
 
   const reserveLabel = reserves.length
-    ? `<text x="8" y="${H + 14}" font-size="9" fill="#888" font-family="sans-serif">+${reserves.length} reserva${reserves.length !== 1 ? 's' : ''}</text>`
+    ? `<p class="field-reserve-label">+${reserves.length} reserva${reserves.length !== 1 ? 's' : ''}</p>`
     : '';
 
   return `
-    <svg class="field-illustration field-illustration--interactive" viewBox="0 0 ${W} ${H + (reserves.length ? 18 : 0)}" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#fff" stroke-width="1.5">
+    <svg class="field-illustration field-illustration--interactive" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#fff" stroke-width="1.5">
       <!-- field outline -->
       <rect x="4" y="4" width="472" height="192" rx="6"/>
       <!-- halfway line -->
@@ -178,8 +178,8 @@ function _renderInteractiveField(present, teams, ppt) {
       ${fixedGkB}
       ${dotsA}
       ${dotsB}
-      ${reserveLabel}
     </svg>
+    ${reserveLabel}
   `;
 }
 

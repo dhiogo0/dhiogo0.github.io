@@ -101,6 +101,13 @@ html, body {
 .field-illustration--interactive {
   opacity: 1;
 }
+.field-reserve-label {
+  margin: 6px 0 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  letter-spacing: .3px;
+}
 
 .add-player-hint {
   display: flex;
