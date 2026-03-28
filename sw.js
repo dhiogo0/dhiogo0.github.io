@@ -1,4 +1,4 @@
-const CACHE = 'racha-facil-v14';
+const CACHE = 'racha-facil-v15';
 
 const STATIC_ASSETS = [
   '/',

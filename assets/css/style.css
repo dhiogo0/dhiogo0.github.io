@@ -1527,7 +1527,10 @@ html, body {
   --border2: rgba(0,0,0,0.16);
   --text:   #07101e;
   --muted:  rgba(7,16,30,0.55);
-  --dimmed: rgba(7,16,30,0.35);
+  --dimmed: rgba(7,16,30,0.50);
+  --green:  #059657;
+  --cyan:   #0094ad;
+  --gold:   #d4a017;
 }
 
 /* bg-mesh — orbs mais visíveis no fundo claro */
@@ -1604,9 +1607,14 @@ html, body {
   border-bottom-color: rgba(0,0,0,0.3);
 }
 
-/* Estrelas — cor vazia visível no fundo claro */
-:root[data-theme="light"] .star     { color: #b8cad9; }
-:root[data-theme="light"] .star-btn { color: #a0b5c8; }
+/* Estrelas — cor vazia cinza visível no fundo claro */
+:root[data-theme="light"] .star         { color: #b0b8c4; }
+:root[data-theme="light"] .star--lit    { color: var(--gold); }
+:root[data-theme="light"] .star-btn     { color: #b0b8c4; }
+:root[data-theme="light"] .star-btn--lit { color: var(--gold); }
+
+/* Valor de chuva — ciano legível no fundo claro */
+:root[data-theme="light"] .weather-widget__stat-val--rain { color: #0098b8; }
 
 /* Tooltip — fundo claro */
 :root[data-theme="light"] [data-tooltip]::after {
